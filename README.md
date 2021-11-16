@@ -25,3 +25,4 @@ Develop code for core analyses:
 |date|activity|
 |:-|:------------|
 |2021-09-08|create repo|
+|2021-11-15|reformat mobility data|
