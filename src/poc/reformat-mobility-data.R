@@ -27,8 +27,8 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'data/safegraph/counties-dates-1-20-22/')
+  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-1-20-22-reformatted/')
   
 } else {
   library(docopt)
@@ -55,7 +55,7 @@ list.files(rd('src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 # get list of files
-files <- data.frame("name" = list.files(paste0(.wd,"data/safegraph/counties-5-18-21/"))) %>%
+files <- data.frame("name" = list.files(.datPF, pattern = "*.txt",recursive = TRUE)) %>%
   # separate file name into start date, county id, and resolution
   separate(name,into = c("start_date","county_id",NA,"resolution",NA), sep = "_", remove = FALSE) %>%
   mutate("start_date" = lubridate::as_date(start_date))
@@ -70,7 +70,7 @@ counties <- unique(files$county_id)
 # function for processing daily data
 process_daily_data <- function(file_name){
   # read in file
-  d <- fread(paste0(.wd,"data/safegraph/counties-5-18-21/",file[,]$name)) %>%
+  d <- fread(paste0(.datPF,file[,]$name)) %>%
     # rename census block group column
     rename("cbg" = "V1") %>%
     # convert from "wide" to "long" format
@@ -100,15 +100,15 @@ for (j in 1:length(counties)){
     d <- rbind(d,dd)
   }
   # write out file with all data from a single county
-  fwrite(d, paste0(.outPF,"safegraph/counties-5-18-21-reformatted/daily-counties/",counties[j],"_cbg_day_SUM.csv"))
+  fwrite(d, paste0(.outPF,"daily-counties/",counties[j],"_cbg_day_SUM.csv"))
 }
 
 # combine county files into a single file
-reformatted_files <- dir(paste0(.outPF,"safegraph/counties-5-18-21-reformatted/daily-counties/"), full.names = TRUE)
+reformatted_files <- dir(paste0(.outPF,"daily-counties/"), full.names = TRUE)
 
 # combine all data
 all_data <- reformatted_files %>%
   map_dfr(fread)
 
 # write out as single file
-fwrite(all_data, paste0(paste0(.outPF,"safegraph/counties-5-18-21-reformatted/all_counties_cbg_day_SUM.csv")))
+fwrite(all_data, paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))
