@@ -144,7 +144,7 @@ for (j in 1:length(counties)){
     d <- rbind(d,dd)
   }
   # write out file with all data from a single county
-  fwrite(d, paste0(.outPF,"daily-counties/hourly-data/",counties[j],"_cbg_day_SUM.csv"))
+  fwrite(d, paste0(.outPF,"daily-counties/hourly-data/",counties[j],"_cbg_hour_SUM.csv"))
 }
 
 
@@ -170,4 +170,4 @@ all_data_hourly <- reformatted_files_hourly %>%
   map_dfr(fread)
 
 # write out as single file
-fwrite(all_data_hourly, paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))
+fwrite(all_data_hourly, paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))
