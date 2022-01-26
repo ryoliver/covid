@@ -35,15 +35,15 @@ if(interactive()) {
   library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
-  .wd <- getwd()
+  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid/'
   .script <-  thisfile()
   .test <- as.logical(ag$test)
   rd <- is_rstudio_project$make_fix_file(.script)
   
   source(rd('src/funs/input_parse.r'))
   
-  .datPF <- makePath(ag$dat)
-  .outPF <- makePath(ag$out)
+  .datPF <- file.path(.wd,'data/safegraph/counties-dates-1-20-22/')
+  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-1-20-22-reformatted/')
 }
 
 #---- Initialize Environment ----#
