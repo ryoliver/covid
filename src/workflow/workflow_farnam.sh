@@ -1,5 +1,5 @@
 #!/bin/bash
-chmod +x /gpfs/ysm/project/jetz/ryo3/projects/covid/src/workflow/workflow.sh
+chmod +x /gpfs/ysm/project/jetz/ryo3/projects/covid/src/workflow/workflow_farnam.sh
 
 #-- parameters
 src=/gpfs/ysm/project/jetz/ryo3/projects/covid/src
