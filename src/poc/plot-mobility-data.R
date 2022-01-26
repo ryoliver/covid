@@ -54,37 +54,43 @@ source(rd('src/startup.r'))
 list.files(rd('src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
-daily_dat <- fread(paste0(.datPF,"safegraph/counties-dates-1-20-22-reformatted/all_counties_cbg_day_SUM.csv"))
+daily_dat <- fread(paste0(.datPF,"safegraph/counties-dates-1-20-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
+  mutate(date = as.Date(date))
+
+county_max_summary <- daily_dat %>%
+  group_by(county_id,date) %>%
+  summarise(count = sum(count)) %>%
+  group_by(county_id, .add = TRUE) %>%
+  summarise(max_count = max(count)) 
+
+county_summary <- daily_dat %>%
+  group_by(county_id,date) %>%
+  summarise(count = sum(count)) %>%
+  left_join(.,county_max_summary, by = "county_id") %>%
+  mutate(pct = (count/max_count)*100)
 
 
-p <- ggplot(data = daily_dat) +
-  stat_summary(aes(x = date,y = count, group = county_id), geom = "point", fun = mean) +
-  stat_summary(aes(x = date,y = count, group = county_id), geom = "line", fun = mean) +
-  stat_summary(aes(x = date,y = count, group = county_id), geom = "ribbon", fun.data = mean_cl_normal, alpha = 0.1) +
+p <- ggplot(data = county_summary) +
+  geom_line(aes(x = date,y = pct, group = county_id), color = "#D8D0C1", alpha = 0.1) +
+  stat_summary(aes(x = date,y = pct), geom = "line", color = "#6F686D", fun = mean, lwd = 0.8) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01)),
+                     breaks = seq(0, max(county_summary$pct),by = 10),
+                     labels = comma) +
   
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_x_date(expand = expansion(mult = c(0, 0.01))) +
   theme_cowplot() +
   theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title = element_text(size = 9),
         axis.text.y  = element_text(size = 8),
         axis.text.x = element_text(size = 8)) +
-  labs(x = "", y = "device counts") 
+  labs(x = "", y = "Relative device count (%)") 
 
-p <- ggplot(data = subset(daily_dat, county_id == 1001)) +
-  geom_line(aes(x = date,y = count, group = cbg)) +
-  geom_point(aes(x = date,y = count, group = cbg)) +
-  
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
-  theme_cowplot() +
-  theme(legend.position = "none",
-        axis.title.x = element_blank(),
-        axis.title = element_text(size = 9),
-        axis.text.y  = element_text(size = 8),
-        axis.text.x = element_text(size = 8)) +
-  labs(x = "", y = "device counts") 
 
-pdf("~/Desktop/test.pdf")
+pdf(paste0(.outPF,"safegraph-relative-device-count.pdf"), width = 7, height = 3.5)
 ggdraw() +
-  draw_plot(p)
+  draw_plot(p) 
 dev.off()
+
+
+
