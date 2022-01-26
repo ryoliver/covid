@@ -40,7 +40,7 @@ if(interactive()) {
   #.test <- as.logical(ag$test)
   rd <- is_rstudio_project$make_fix_file(.script)
   
-  source(rd('src/funs/input_parse.r'))
+  #source(rd('src/funs/input_parse.r'))
   
   .datPF <- file.path(.wd,'data/safegraph/counties-dates-1-20-22/')
   .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-1-20-22-reformatted/')
