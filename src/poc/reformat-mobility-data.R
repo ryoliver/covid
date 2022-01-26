@@ -5,18 +5,18 @@
 
 # ==== Breezy setup ====
 
-'
-Template
-Usage:
-script_template <taxa> <dat> <out> 
-script_template (-h | --help)
-Parameters:
-  dat: path to input csv file. 
-  out: path to output directory.
-Options:
--h --help     Show this screen.
--v --version     Show version.
-' -> doc
+#'
+#Template
+#Usage:
+#script_template <taxa> <dat> <out> 
+#script_template (-h | --help)
+#Parameters:
+#  dat: path to input csv file. 
+#  out: path to output directory.
+#Options:
+#-h --help     Show this screen.
+#-v --version     Show version.
+#' -> doc
 
 #---- Input Parameters ----#
 if(interactive()) {
@@ -34,7 +34,7 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  ag <- docopt(doc, version = '0.1\n')
+  #ag <- docopt(doc, version = '0.1\n')
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid/'
   .script <-  thisfile()
   .test <- as.logical(ag$test)
