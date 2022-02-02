@@ -42,8 +42,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
-  
+
 } else {
   library(docopt)
   library(rprojroot)
@@ -53,8 +52,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-1-22/')
-  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-1-22-reformatted/')
+  .datPF <- file.path(.wd,'data/')
 }
 
 
