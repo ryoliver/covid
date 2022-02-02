@@ -71,7 +71,6 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt <- tbl(db,'event_clean')
 
 # read in census block group geometries
 message("reading in census block group geometries...")
