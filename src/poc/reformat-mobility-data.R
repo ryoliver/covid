@@ -1,6 +1,19 @@
 #!/usr/bin/env Rscript --vanilla
 # chmod 744 script_template.r #Use to make executable
 
+# DESCRIPTION #
+#
+# This script reformats human mobility data for the COVID-19 Animal Movement Project
+# See project documentation for details about anticipated directory structure.
+#
+# Major tasks fof this script:
+#   * read in safegraph data
+#   * reformat from wide to long format
+#   * write out data by counties
+#   * read in county files and combine into single file
+#   * repeat for daily and hourly data
+
+#
 # This script implements the breezy philosophy: github.com/benscarlson/breezy
 
 # ==== Breezy setup ====

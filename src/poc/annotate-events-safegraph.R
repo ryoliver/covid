@@ -2,22 +2,16 @@
 #
 # DESCRIPTION #
 #
-# This script determines the administrative units for records for the COVID-19 Animal Movement Project
+# This script links human mobility data with animal events for the COVID-19 Animal Movement Project
+# Human mobility sourced from SafeGraph, provided by Song Gao
+#
 # See project documentation for details about anticipated directory structure.
+# This script implements the breezy philosophy: github.com/benscarlson/breezy
 #
 # Major tasks fof this script:
 #   * Annotate event dataset with:
-#     * CensusBlockGroup (12 digit FIPS code)
-#     * BlockGroup (1 digit FIPS code)
-#     * TractCode (6 digit FIPS)
-#     * CountyFIPS (3 digit FIPS)
-#     * StateFIPS (2 digit FIPS)
-#     * County (character string)
-#     * State (2 character code)
-#   *write out table with administrative info
-#
-# This script implements the breezy philosophy: github.com/benscarlson/breezy
-
+#     * daily and hourly device counts
+#   *write out table with decive counts
 
 # ==== Breezy setup ====
 
@@ -44,8 +38,8 @@ if(interactive()) {
   rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
-
+  .datPF <- file.path(.wd,'analysis/')
+  
 } else {
   library(docopt)
   library(rprojroot)
@@ -55,7 +49,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .datPF <- file.path(.wd,'analysis/')
 }
 
 
@@ -74,23 +68,30 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-# read in census block group geometries
-message("reading in census block group geometries...")
-cbg_sf <- st_read(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
-
-# read in event table
 message("reading in event table...")
-evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
-  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84") # convert events to sf object
+evt_df <- dbGetQuery(db,'SELECT * from event_clean') %>%
+  separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
+  mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
+  select(date_hour)
 
-# intersect event table with census block group geometries
-message("intersecting events with census block groups...")
-evt_cbg <- st_intersection(.,cbg_sf) %>%
-  st_drop_geometry()
+message("reading in safegraph data...")
+daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
+  select(cbg,date,count) %>%
+  rename(daily_count = count)
 
-# write out new table with annotations
+hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
+  select(cbg,date,count)  %>%
+  mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
+  rename(hourly_count = count)
+
+message("joining events with safegraph data...")
+evt_sg <- left_join(evt_df,daily_data, by = c("CensusBlockGroup" = "cbg", "date" = "date")) %>%
+  left_join(.,hourly_data, by = c("CensusBlockGroup" = "cbg", "date_hour" = "date_hour")) %>%
+  select(-date,-date_hour)
+
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
 message("done!")
+
 
