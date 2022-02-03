@@ -95,7 +95,7 @@ county_summary <- evt_ind %>%
   mutate("level" = rep("county", nrow(.)))
 
 cbg_summary <- evt_ind %>%
-  group_by(CensusBlockGroup) %>%
+  group_by(cbg_2010) %>%
   summarise("n_records" = n_distinct(event_id),
             "n_individuals" = n_distinct(individual_id),
             "n_species" = n_distinct(taxon_canonical_name)) %>%

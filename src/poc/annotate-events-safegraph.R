@@ -84,8 +84,8 @@ hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/
   rename(hourly_count = count)
 
 message("joining events with safegraph data...")
-evt_sg <- left_join(evt_df,daily_data, by = c("CensusBlockGroup" = "cbg", "date" = "date")) %>%
-  left_join(.,hourly_data, by = c("CensusBlockGroup" = "cbg", "date_hour" = "date_hour")) %>%
+evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
+  left_join(.,hourly_data, by = c("cbg_2010" = "cbg", "date_hour" = "date_hour")) %>%
   select(-date,-date_hour)
 
 message("writing out new event table...")
