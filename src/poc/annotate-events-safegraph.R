@@ -58,7 +58,6 @@ suppressWarnings(
     library(DBI)
     library(RSQLite)
     library(data.table)
-    library(sf)
   }))
 
 #---- Initialize database ----#
