@@ -72,7 +72,7 @@ suppressWarnings(
 
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
-invisible(assert_that(length(dbListTables(db))>0))
+#invisible(assert_that(length(dbListTables(db))>0))
 
 # read in census block group geometries
 message("reading in census block group geometries...")
