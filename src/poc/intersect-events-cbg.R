@@ -68,7 +68,7 @@ suppressWarnings(
   }))
 
 #---- Initialize database ----#
-invisible(assert_that(file.exists(.dbPF)))
+#invisible(assert_that(file.exists(.dbPF)))
 
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
