@@ -13,6 +13,7 @@ chmod +x $src/workflow/run_event_summary.sh
 
 
 #run
+
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
 
