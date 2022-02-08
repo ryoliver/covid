@@ -56,6 +56,7 @@ if(interactive()) {
   .outPF <- file.path(.wd,'analysis/')
 }
 
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({

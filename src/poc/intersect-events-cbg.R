@@ -58,6 +58,7 @@ if(interactive()) {
   .datPF <- file.path(.wd,'data/')
 }
 
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -68,11 +69,11 @@ suppressWarnings(
   }))
 
 #---- Initialize database ----#
-#invisible(assert_that(file.exists(.dbPF)))
+invisible(assert_that(file.exists(.dbPF)))
 
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
-#invisible(assert_that(length(dbListTables(db))>0))
+invisible(assert_that(length(dbListTables(db))>0))
 
 # read in census block group geometries
 message("reading in census block group geometries...")
