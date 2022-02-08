@@ -87,8 +87,8 @@ evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
 evt_cbg <- st_intersection(.,cbg_sf) %>%
-  st_drop_geometry() %>%
-  rename(cbg_2010 = CensusBlockGroup)
+  rename(cbg_2010 = CensusBlockGroup) %>%
+  st_drop_geometry()
 
 # write out new table with annotations
 message("writing out new event table...")
