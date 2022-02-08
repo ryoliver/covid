@@ -52,7 +52,7 @@ if(interactive()) {
   .datPF <- file.path(.wd,'analysis/')
 }
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
