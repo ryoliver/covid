@@ -52,6 +52,7 @@ if(interactive()) {
   .datPF <- file.path(.wd,'analysis/')
 }
 
+message("start safegraph annotation")
 source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(
@@ -72,7 +73,6 @@ message("reading in event table...")
 evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
   separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
-  select(date_hour) %>%
   collect()
 
 message("reading in safegraph data...")
@@ -93,6 +93,6 @@ evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
-message("done!")
+message("safegraph annotation done!")
 
 

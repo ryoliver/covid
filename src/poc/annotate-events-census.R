@@ -52,6 +52,8 @@ if(interactive()) {
   .datPF <- file.path(.wd,'data/')
 }
 
+message("start census annotation")
+
 source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(
@@ -85,4 +87,4 @@ evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_census", value = evt_acs, append = FALSE, overwrite = T)
 
-message("done!")
+message("census annotation done!")
