@@ -69,7 +69,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT * from event_clean') %>%
+evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
   collect()
 
 message("reading in census data...")
