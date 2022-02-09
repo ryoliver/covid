@@ -69,7 +69,8 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT * from event_clean') 
+evt_df <- dbGetQuery(db,'SELECT * from event_clean') %>%
+  collect()
 
 message("reading in census data...")
 
@@ -79,9 +80,9 @@ acs2019 <- fread(paste0(.datPF,"safegraph_open_census_data_2019/data/cbg_b01.csv
          total_population_2019 = B01003e1)
 
 message("joining events with census data...")
-evt_acs <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
+evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_acs", value = evt_acs, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_census", value = evt_acs, append = FALSE, overwrite = T)
 
 message("done!")

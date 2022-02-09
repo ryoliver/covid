@@ -72,7 +72,8 @@ message("reading in event table...")
 evt_df <- dbGetQuery(db,'SELECT * from event_clean') %>%
   separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
-  select(date_hour)
+  select(date_hour) %>%
+  collect()
 
 message("reading in safegraph data...")
 daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
