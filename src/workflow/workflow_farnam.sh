@@ -8,6 +8,7 @@ src=/gpfs/ysm/project/jetz/ryo3/projects/covid/src
 chmod +x $src/workflow/run_safegraph_processing.sh
 chmod +x $src/workflow/run_cbg_intersection.sh
 chmod +x $src/workflow/run_safegraph_annotation.sh
+chmod +x $src/workflow/run_census_annotation.sh
 chmod +x $src/workflow/run_event_summary.sh
 
 
@@ -22,6 +23,9 @@ sbatch $src/workflow/run_cbg_intersection.sh
 
 # annotate events with safegraph data
 #sbatch $src/workflow/run_safegraph_annotation.sh
+
+# annotate events with census data
+#sbatch $src/workflow/run_census_annotation.sh
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
