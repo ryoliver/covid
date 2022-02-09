@@ -17,6 +17,7 @@ Develop code for to support annotating animal locations:
 
 ## to do
 * run intersection/annotation
+* annotate with 2019 population density
 * get geometries for 2020 census block groups
 * repeat intersection with 2020 census geometries
 * repeat annotation with 2020 population density
