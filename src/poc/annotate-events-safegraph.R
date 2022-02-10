@@ -76,11 +76,11 @@ evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
   collect()
 
 message("reading in safegraph data...")
-daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
+daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
   select(cbg,date,count) %>%
   rename(daily_count = count)
 
-hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-1-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
+hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
   select(cbg,date,count)  %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   rename(hourly_count = count)

@@ -40,8 +40,8 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-1-22/')
-  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-1-22-reformatted/')
+  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
+  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
   
 } else {
   library(docopt)
@@ -55,8 +55,8 @@ if(interactive()) {
   
   #source(rd('src/funs/input_parse.r'))
   
-  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-1-22/')
-  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-1-22-reformatted/')
+  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
+  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
 }
 
 #---- Initialize Environment ----#
