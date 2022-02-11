@@ -16,7 +16,8 @@ Develop code for to support annotating animal locations:
   * summarize n locations, indviduals, species by census block group, county, state
 
 ## to do
-* run intersection/annotation
+* debug 2019 safegraph reformatting
+* debug annotation (sg: oom, census: variable type)
 * annotate with 2019 population density
 * get geometries for 2020 census block groups
 * repeat intersection with 2020 census geometries
