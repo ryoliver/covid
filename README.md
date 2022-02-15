@@ -12,13 +12,18 @@ Develop code for to support annotating animal locations:
 * **annotate-events-safegraph.r**
   * annotate animal location event tables with SafeGraph data based on census block group ID
   * export event table with SafeGraph daily and hourly device count
+* **annotate-events-census.r**
+  * annotate animal location event tables with census data based on census block group ID
+  * export event table with 2019 ACS population density
 * **summarize-events.r**
   * summarize n locations, indviduals, species by census block group, county, state
 
 ## to do
 * debug 2019 safegraph reformatting
+* rerun 2019/2020 safegraph reformatting
 * debug annotation (sg: oom, census: variable type)
-* annotate with 2019 population density
+* run safegraph annotation
+* run annotation with 2019 population density
 * get geometries for 2020 census block groups
 * repeat intersection with 2020 census geometries
 * repeat annotation with 2020 population density
