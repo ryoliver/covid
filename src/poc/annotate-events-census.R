@@ -79,7 +79,8 @@ message("reading in census data...")
 acs2019 <- fread(paste0(.datPF,"safegraph_open_census_data_2019/data/cbg_b01.csv")) %>%
   select(census_block_group,B01003e1) %>%
   rename(cbg_2010 = census_block_group,
-         total_population_2019 = B01003e1)
+         total_population_2019 = B01003e1) %>%
+  mutate(cbg_2010 = as.character(cbg_2010))
 
 message("joining events with census data...")
 evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
