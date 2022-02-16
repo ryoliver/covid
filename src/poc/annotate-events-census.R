@@ -86,6 +86,6 @@ message("joining events with census data...")
 evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_census", value = evt_acs, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_census", value = evt_census, append = FALSE, overwrite = T)
 
 message("census annotation done!")
