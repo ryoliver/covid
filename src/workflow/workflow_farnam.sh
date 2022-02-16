@@ -25,7 +25,7 @@ chmod +x $src/workflow/run_event_summary.sh
 sbatch $src/workflow/run_safegraph_annotation.sh
 
 # annotate events with census data
-sbatch $src/workflow/run_census_annotation.sh
+#sbatch $src/workflow/run_census_annotation.sh
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
