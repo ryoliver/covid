@@ -16,10 +16,10 @@ chmod +x $src/workflow/run_event_summary.sh
 #run
 
 # process safegraph data
-sbatch $src/workflow/run_safegraph_processing.sh
+#sbatch $src/workflow/run_safegraph_processing.sh
 
 # intersect events with census geometries
-#sbatch $src/workflow/run_cbg_intersection.sh
+sbatch $src/workflow/run_cbg_intersection.sh
 
 # annotate events with safegraph data
 #sbatch $src/workflow/run_safegraph_annotation.sh
