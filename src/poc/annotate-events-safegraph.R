@@ -82,8 +82,7 @@ daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/
 
 hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
   select(cbg,date,count)  %>%
-  mutate(timestamp = as.character(timestamp)) %>%
-  mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
+  mutate("date_hour" = str_trunc(date,13,"right","")) %>%
   rename(hourly_count = count)
 
 message("joining events with safegraph data...")
