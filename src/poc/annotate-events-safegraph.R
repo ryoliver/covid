@@ -79,7 +79,7 @@ message("reading in safegraph data...")
 daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
   select(cbg,date,count) %>%
   rename(daily_count = count) %>%
-  mutate(cbg = as.character(cbg_2010))
+  mutate(cbg = as.character(cbg))
 
 #hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
 #  select(cbg,date,count) %>%
