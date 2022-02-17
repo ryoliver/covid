@@ -78,13 +78,15 @@ evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
 message("reading in safegraph data...")
 daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
   select(cbg,date,count) %>%
-  rename(daily_count = count)
+  rename(daily_count = count) %>%
+  mutate(cbg_2010 = as.character(cbg_2010))
 
 #hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
 #  select(cbg,date,count) %>%
 #  mutate(date = as.character(date)) %>%
 #  mutate("date_hour" = str_trunc(date,13,"right","")) %>%
-#  rename(hourly_count = count)
+#  rename(hourly_count = count) %>%
+#  mutate(cbg_2010 = as.character(cbg_2010))
 
 message("joining events with safegraph data...")
 evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
