@@ -80,16 +80,19 @@ daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/
   select(cbg,date,count) %>%
   rename(daily_count = count)
 
-hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
-  select(cbg,date,count) %>%
-  mutate(date = as.character(date)) %>%
-  mutate("date_hour" = str_trunc(date,13,"right","")) %>%
-  rename(hourly_count = count)
+#hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
+#  select(cbg,date,count) %>%
+#  mutate(date = as.character(date)) %>%
+#  mutate("date_hour" = str_trunc(date,13,"right","")) %>%
+#  rename(hourly_count = count)
 
 message("joining events with safegraph data...")
 evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
-  left_join(.,hourly_data, by = c("cbg_2010" = "cbg", "date_hour" = "date_hour")) %>%
-  select(-date,-date_hour)
+  select(-date)
+
+#evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
+#  left_join(.,hourly_data, by = c("cbg_2010" = "cbg", "date_hour" = "date_hour")) %>%
+#  select(-date,-date_hour)
 
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
