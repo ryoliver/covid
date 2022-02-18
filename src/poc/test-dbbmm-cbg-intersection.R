@@ -27,11 +27,11 @@ suppressWarnings(
   suppressPackageStartupMessages({
     library(sf)
     library(data.table)
+    library(units)
   }))
 
 
-load("~/Desktop/dbbmm_1003870094_2020.rdata")
-
+load("~/Desktop/dbbmm_1003870095_2020.rdata")
 
 r <- tmp_out$`dBBMM Object`
 # normalize the probs within each week
@@ -40,24 +40,49 @@ rb <- UDStack(r)
 UDr <- getVolumeUD(rb)
 
 j <- 1
-# loop through the layers in each USstack
-#for(j in 1:nlayers(UDr)){
-  # return 1s within the 95% contour, do this for each week/layer
-  ud95 <- UDr[[j]]<=.95
+
+# return 1s within the 95% contour, do this for each week/layer
+ud95 <- UDr[[j]]<=.95
   # extract the probabilities for cells within the 95% contour
   r95 <- ud95*rb[[j]]
-  # then you do something with the r95...
-#} # j
+
 
 cbg <- st_read("~/Documents/Yale/projects/covid/data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson")
 r95 <- projectRaster(r95, crs = crs(cbg))
 
-cbg$area <- st_area(cbg)
+cbg$area <- st_area(cbg)/1000000
+cbg <- drop_units(cbg)
+
+cbg <- cbg %>%
+  filter(!State %in% c("HI","AS", "GU", "MP", "PR", "VI"))
+
+cbg_continental <- cbg %>%
+  filter(!State %in% c("HI","AS", "GU", "MP", "PR", "VI", "AK"))
+
+unique(cbg$State)
+
+ggplot(cbg_continental, aes(x = area)) +
+  geom_histogram(fill = "grey40", color = "transparent") +
+  scale_x_continuous(trans = "log10", labels = comma) +
+  labs(x = "area (km2)")
+
+p1 <- ggplot() +
+  geom_sf(data = cbg_continental, fill = "transparent", color = "grey75", lwd = 0.0001) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_blank()) +
+  coord_sf(datum = NA)
+
+pdf("~/Desktop/test.pdf")
+ggdraw() +
+  draw_plot(p1)
+dev.off()
+
+max(cbg$area, na.rm = TRUE)
 
 r95
 cbg
 
-
+unique(cbg$State)
 extent(r95)  
 
 plot(r95)

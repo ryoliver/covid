@@ -18,10 +18,14 @@ Develop code for to support annotating animal locations:
 * **summarize-events.r**
   * summarize n locations, indviduals, species by census block group, county, state
 
+## completed
+* procces 2019/2020 safegraph data
+* spatially intersect event table + cbg geometries
+* annotate event table with 2019/2020 safegraph daily data
+* annotate event table with 2019 population density
+
 ## to do
-* run safegraph annotations
-  * oom issues
-  * trying just daily data
+* debug hourly safegraph annotation
 * get geometries for 2020 census block groups
 * repeat intersection with 2020 census geometries
 * repeat annotation with 2020 population density
