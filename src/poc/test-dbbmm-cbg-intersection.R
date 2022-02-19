@@ -28,10 +28,14 @@ suppressWarnings(
     library(sf)
     library(data.table)
     library(units)
+    library(terra)
+    library(janitor)
+    library(tidyverse)
+    library(move)
   }))
 
 
-load("~/Desktop/dbbmm_1003870095_2020.rdata")
+load("~/Desktop/dbbmm_1893847734_2019.rdata")
 
 r <- tmp_out$`dBBMM Object`
 # normalize the probs within each week
@@ -48,18 +52,48 @@ ud95 <- UDr[[j]]<=.95
 
 
 cbg <- st_read("~/Documents/Yale/projects/covid/data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson")
-r95 <- projectRaster(r95, crs = crs(cbg))
+cbg <- st_transform(cbg, crs(r95))
+
+
+r95_vect <- rasterToPolygons(r95)
+
+r95_vect <- st_as_sf(r95_vect) %>%
+  clean_names() %>%
+  mutate(x = layer) %>%
+  filter(x > 0)
+
+cbgs <- st_crop(cbg, st_bbox(r95_vect))
+
+cbgs$State
+
+ggplot() +
+  geom_sf(data = cbgs, fill = "transparent", colour = "grey75") +
+  geom_sf(data = r95_vect, aes(fill = x)) +
+  theme(legend.position = "bottom", 
+        legend.key.width = unit(1.5,"cm"),
+        legend.title=element_text(size=8),
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_blank()) +
+  labs(main = paste0(cbgs$State, ", n cbgs: ", nrow(cbgs)))
+  coord_sf(datum = NA)
+
+plot(r95,
+     axes = FALSE,
+     box = FALSE)
+plot(st_geometry(cbgs),
+     add = TRUE,
+     col = "transparent")
+
+cbg <- st_transform(cbg, crs(r95))
 
 cbg$area <- st_area(cbg)/1000000
 cbg <- drop_units(cbg)
 
-cbg <- cbg %>%
-  filter(!State %in% c("HI","AS", "GU", "MP", "PR", "VI"))
-
 cbg_continental <- cbg %>%
   filter(!State %in% c("HI","AS", "GU", "MP", "PR", "VI", "AK"))
 
-unique(cbg$State)
 
 ggplot(cbg_continental, aes(x = area)) +
   geom_histogram(fill = "grey40", color = "transparent") +
