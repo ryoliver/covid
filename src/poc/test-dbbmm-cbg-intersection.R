@@ -81,6 +81,7 @@ cbg <- st_transform(cbg, crs(r95))
 
 
 visualize_dbbmm <- function(i){
+  message("processing first dbbmm...")
   load(files[i,]$file_path)
   
   r <- tmp_out$`dBBMM Object`
@@ -105,7 +106,11 @@ visualize_dbbmm <- function(i){
     mutate(x = layer) %>%
     filter(x > 0)
   
-  cbgs <- st_crop(cbg, st_bbox(r95_vect))
+  message("transforming cbg geometries...")
+  cbgs <- st_transform(cbg, crs(r95))
+  
+  message("cropping cbg geometries...")
+  cbgs <- st_crop(cbgs, st_bbox(r95_vect))
   
   id <- files[i,]$individual_id
   
@@ -114,6 +119,7 @@ visualize_dbbmm <- function(i){
     filter(individual_id == id) %>%
     dplyr::select(taxon_canonical_name)
   
+  message("plotting...")
   p <- ggplot() +
     geom_sf(data = cbgs, fill = "transparent", colour = "grey75") +
     geom_sf(data = r95_vect, aes(fill = x)) +
@@ -137,8 +143,6 @@ visualize_dbbmm <- function(i){
 
 for (i in 1:nrow(files)){
   visualize_dbbmm(i)
-  i
+  message(i)
 }
-
-
-  
+message("done!")
