@@ -10,8 +10,7 @@ chmod +x $src/workflow/run_cbg_intersection.sh
 chmod +x $src/workflow/run_safegraph_annotation.sh
 chmod +x $src/workflow/run_census_annotation.sh
 chmod +x $src/workflow/run_event_summary.sh
-
-
+chmod +x $src/workflow/run_dbbmm_test.sh
 
 #run
 
@@ -22,7 +21,7 @@ chmod +x $src/workflow/run_event_summary.sh
 #sbatch $src/workflow/run_cbg_intersection.sh
 
 # annotate events with safegraph data
-sbatch $src/workflow/run_safegraph_annotation.sh
+#sbatch $src/workflow/run_safegraph_annotation.sh
 
 # annotate events with census data
 #sbatch $src/workflow/run_census_annotation.sh
@@ -30,4 +29,5 @@ sbatch $src/workflow/run_safegraph_annotation.sh
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
 
-
+# summarize event data
+sbatch $src/workflow/run_dbbmm_test.sh

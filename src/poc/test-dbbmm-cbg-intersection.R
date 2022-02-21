@@ -2,13 +2,16 @@ if(interactive()) {
   rm(list=ls())
   library(here)
   
-  .wd <- '~/Documents/Yale/projects/covid'
-  .test <- TRUE
+  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   rd <- here::here
   
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbbmmPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/out/dbbmms'
   .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/figures/dbbmm-test/')
   
 } else {
+  rm(list=ls())
   library(docopt)
   library(rprojroot)
   
@@ -17,7 +20,9 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbbmmPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/out/dbbmms'
   .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/figures/dbbmm-test/')
 }
 
 
@@ -28,14 +33,31 @@ suppressWarnings(
     library(sf)
     library(data.table)
     library(units)
-    library(terra)
     library(janitor)
     library(tidyverse)
     library(move)
+    library(DBI)
+    library(RSQLite)
   }))
 
 
-load("~/Desktop/dbbmm_1893847734_2019.rdata")
+message("pulling file list...")
+files <- data.frame("file_path" = list.files(.dbbmmPF, pattern = "*.rdata",recursive = TRUE,full.names = TRUE),
+                    "name" = list.files(.dbbmmPF, pattern = "*.rdata",recursive = TRUE)) %>%
+  separate(name,into = c(NA,"individual_id",NA), sep = "_", remove = FALSE) %>%
+  sample_n(.,100)
+
+message("connecting to db...")
+db <- dbConnect(RSQLite::SQLite(), .dbPF)
+
+message("pulling individual table...")
+indtb <- tbl(db, "individual") %>%  
+  collect() %>%
+  filter(individual_id %in% files$individual_id)
+
+### read in first dBBMM
+message("processing first dbbmm...")
+load(files[1,]$file_path)
 
 r <- tmp_out$`dBBMM Object`
 # normalize the probs within each week
@@ -47,79 +69,76 @@ j <- 1
 
 # return 1s within the 95% contour, do this for each week/layer
 ud95 <- UDr[[j]]<=.95
+# extract the probabilities for cells within the 95% contour
+r95 <- ud95*rb[[j]]
+
+### read in census block group geometries
+message("reading cbg geometries...")
+cbg <- st_read(paste0(.datPF, "safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
+
+message("transforming cbg geometries...")
+cbg <- st_transform(cbg, crs(r95))
+
+
+visualize_dbbmm <- function(i){
+  load(files[i,]$file_path)
+  
+  r <- tmp_out$`dBBMM Object`
+  # normalize the probs within each week
+  rb <- UDStack(r)
+  # convert to quantiles
+  UDr <- getVolumeUD(rb)
+  
+  j <- 1
+  # return 1s within the 95% contour, do this for each week/layer
+  ud95 <- UDr[[j]]<=.95
   # extract the probabilities for cells within the 95% contour
   r95 <- ud95*rb[[j]]
+  
+  r95 <- reclassify(r95, cbind(0,NA))
+  r95_trim <- raster::trim(r95)
+  
+  r95_vect <- rasterToPolygons(r95_trim)
+  
+  r95_vect <- st_as_sf(r95_vect) %>%
+    clean_names() %>%
+    mutate(x = layer) %>%
+    filter(x > 0)
+  
+  cbgs <- st_crop(cbg, st_bbox(r95_vect))
+  
+  id <- files[i,]$individual_id
+  
+  species_name <- indtb %>%
+    as.data.frame() %>%
+    filter(individual_id == id) %>%
+    dplyr::select(taxon_canonical_name)
+  
+  p <- ggplot() +
+    geom_sf(data = cbgs, fill = "transparent", colour = "grey75") +
+    geom_sf(data = r95_vect, aes(fill = x)) +
+    theme(legend.position = "bottom", 
+          legend.key.width = unit(1.5,"cm"),
+          legend.title=element_text(size=8),
+          legend.margin=margin(0,0,0,0),
+          legend.box.margin=margin(-10,-10,-10,-10)) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_blank()) +
+    labs(title = paste0(species_name$taxon_canonical_name,", ",
+                        unique(cbgs$State),", n cbgs = ", nrow(cbgs))) +
+    coord_sf(datum = NA)
+  
+  pdf(paste0(.outPF,id,".pdf"))
+  print(
+    ggdraw() +
+      draw_plot(p))
+  dev.off()
+}
 
-
-cbg <- st_read("~/Documents/Yale/projects/covid/data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson")
-cbg <- st_transform(cbg, crs(r95))
-
-
-r95_vect <- rasterToPolygons(r95)
-
-r95_vect <- st_as_sf(r95_vect) %>%
-  clean_names() %>%
-  mutate(x = layer) %>%
-  filter(x > 0)
-
-cbgs <- st_crop(cbg, st_bbox(r95_vect))
-
-cbgs$State
-
-ggplot() +
-  geom_sf(data = cbgs, fill = "transparent", colour = "grey75") +
-  geom_sf(data = r95_vect, aes(fill = x)) +
-  theme(legend.position = "bottom", 
-        legend.key.width = unit(1.5,"cm"),
-        legend.title=element_text(size=8),
-        legend.margin=margin(0,0,0,0),
-        legend.box.margin=margin(-10,-10,-10,-10)) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_blank()) +
-  labs(main = paste0(cbgs$State, ", n cbgs: ", nrow(cbgs)))
-  coord_sf(datum = NA)
-
-plot(r95,
-     axes = FALSE,
-     box = FALSE)
-plot(st_geometry(cbgs),
-     add = TRUE,
-     col = "transparent")
-
-cbg <- st_transform(cbg, crs(r95))
-
-cbg$area <- st_area(cbg)/1000000
-cbg <- drop_units(cbg)
-
-cbg_continental <- cbg %>%
-  filter(!State %in% c("HI","AS", "GU", "MP", "PR", "VI", "AK"))
-
-
-ggplot(cbg_continental, aes(x = area)) +
-  geom_histogram(fill = "grey40", color = "transparent") +
-  scale_x_continuous(trans = "log10", labels = comma) +
-  labs(x = "area (km2)")
-
-p1 <- ggplot() +
-  geom_sf(data = cbg_continental, fill = "transparent", color = "grey75", lwd = 0.0001) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_blank()) +
-  coord_sf(datum = NA)
-
-pdf("~/Desktop/test.pdf")
-ggdraw() +
-  draw_plot(p1)
-dev.off()
-
-max(cbg$area, na.rm = TRUE)
-
-r95
-cbg
-
-unique(cbg$State)
-extent(r95)  
-
-plot(r95)
+for (i in 1:nrow(files)){
+  visualize_dbbmm(i)
+  i
+}
 
 
   
