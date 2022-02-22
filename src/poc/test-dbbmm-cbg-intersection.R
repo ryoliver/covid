@@ -112,6 +112,14 @@ visualize_dbbmm <- function(i){
   message("cropping cbg geometries...")
   cbgs <- st_crop(cbgs, st_bbox(r95_vect))
   
+  cbgs$area <- st_area(cbgs)/1000000
+  cbgs <- drop_units(cbgs)
+  
+  r95_vect$area <- st_area(r95_vect)/1000000
+  r95_vect <- drop_units(r95_vect)
+  
+  
+  
   id <- files[i,]$individual_id
   
   species_name <- indtb %>%
@@ -134,15 +142,40 @@ visualize_dbbmm <- function(i){
                         unique(cbgs$State),", n cbgs = ", nrow(cbgs))) +
     coord_sf(datum = NA)
   
-  pdf(paste0(.outPF,id,".pdf"))
+  p2 <- ggplot(cbgs, aes(x = area)) +
+    geom_histogram(fill = "grey40", color = "transparent") +
+    scale_x_continuous(labels = comma) +
+    labs(x = "area (km2)", title = "cbg")
+  
+  p3 <- ggplot(r95_vect, aes(x = area)) +
+    geom_histogram(fill = "grey40", color = "transparent") +
+    scale_x_continuous(labels = comma) +
+    labs(x = "area (km2)", title = "dBBMM")
+  
+  
+  pdf(paste0(.outPF,"test.pdf"))
   print(
     ggdraw() +
-      draw_plot(p))
+      draw_plot(p, x = 0, y = 0.3, height = 0.7, width = 1) +
+      draw_plot(p2, x = 0, y = 0, height = 0.3, width = 0.5) +
+      draw_plot(p3, x = 0.5, y = 0, height = 0.3, width = 0.5))
   dev.off()
+  
+  #pdf(paste0(.outPF,id,".pdf"))
+  #print(
+  #  ggdraw() +
+  #    draw_plot(p))
+  #dev.off()
 }
 
-for (i in 1:nrow(files)){
+
+i <- 1
   visualize_dbbmm(i)
   message(i)
-}
+
+
+#for (i in 1:nrow(files)){
+#  visualize_dbbmm(i)
+#  message(i)
+#}
 message("done!")
