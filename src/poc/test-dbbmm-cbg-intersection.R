@@ -81,7 +81,7 @@ cbg <- st_transform(cbg, crs(r95))
 
 
 visualize_dbbmm <- function(i){
-  message("processing first dbbmm...")
+  message("processing dbbmm...")
   load(files[i,]$file_path)
   
   r <- tmp_out$`dBBMM Object`
@@ -130,7 +130,7 @@ visualize_dbbmm <- function(i){
   message("plotting...")
   p <- ggplot() +
     geom_sf(data = cbgs, fill = "transparent", colour = "grey75") +
-    geom_sf(data = r95_vect, aes(fill = x)) +
+    geom_sf(data = r95_vect, fill = "transparent", colour = "red") +
     theme(legend.position = "bottom", 
           legend.key.width = unit(1.5,"cm"),
           legend.title=element_text(size=8),
@@ -153,29 +153,18 @@ visualize_dbbmm <- function(i){
     labs(x = "area (km2)", title = "dBBMM")
   
   
-  pdf(paste0(.outPF,"test.pdf"))
+  pdf(paste0(.outPF,id,".pdf"))
   print(
     ggdraw() +
       draw_plot(p, x = 0, y = 0.3, height = 0.7, width = 1) +
       draw_plot(p2, x = 0, y = 0, height = 0.3, width = 0.5) +
       draw_plot(p3, x = 0.5, y = 0, height = 0.3, width = 0.5))
   dev.off()
-  
-  #pdf(paste0(.outPF,id,".pdf"))
-  #print(
-  #  ggdraw() +
-  #    draw_plot(p))
-  #dev.off()
 }
 
 
-i <- 1
+for (i in 1:nrow(files)){
   visualize_dbbmm(i)
   message(i)
-
-
-#for (i in 1:nrow(files)){
-#  visualize_dbbmm(i)
-#  message(i)
-#}
+}
 message("done!")
