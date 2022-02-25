@@ -25,6 +25,7 @@ Develop code for to support annotating animal locations:
 * annotate event table with 2019 population density
 
 ## to do
+* rerun annotations with new event table
 * debug hourly safegraph annotation
 * get geometries for 2020 census block groups
 * repeat intersection with 2020 census geometries
