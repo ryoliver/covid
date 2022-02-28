@@ -28,7 +28,7 @@ chmod +x $src/workflow/run_dbbmm_test.sh
 #sbatch $src/workflow/run_census_annotation.sh
 
 # annotate events with census data
-#sbatch $src/workflow/run_ghm_annotation.sh
+sbatch $src/workflow/run_ghm_annotation.sh
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
