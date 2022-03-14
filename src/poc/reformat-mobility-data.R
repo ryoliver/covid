@@ -71,6 +71,7 @@ list.files(rd('src/funs/auto'),full.names=TRUE) %>%
 files <- data.frame("name" = list.files(.datPF, pattern = "*.txt",recursive = TRUE)) %>%
   # separate file name into start date, county id, and resolution
   separate(name,into = c("start_date","county_id",NA,"resolution",NA), sep = "_", remove = FALSE) %>%
+  separate(start_date, into = c("start_date", NA), sep = "/", remove = TRUE) %>%
   mutate("start_date" = lubridate::as_date(start_date))
 
 # filter to daily data
@@ -102,6 +103,18 @@ process_daily_data <- function(file_name){
 }
 
 
+for(i in 1:nrow(files_daily)){
+  file <- files_daily[i,]
+  d <- process_daily_data(paste0(.datPF,file[,]$name))
+  fname <- str_sub(file$name, start = 12L, end = -5L)
+  fwrite(d, paste0(.outPF,"/daily-data/",fname,".csv"))
+}
+
+
+
+
+
+if (1 == 2){
 if(length(list.files(paste0(.outPF,"/daily-data/"))) == length(counties)){
   message("daily data already processed!")
   }else{
@@ -207,4 +220,4 @@ if(file.exists(paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))){
   fwrite(all_data_hourly, paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))
 }
   
-  
+}  
