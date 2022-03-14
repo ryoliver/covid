@@ -107,7 +107,7 @@ for(i in 1:nrow(files_daily)){
   file <- files_daily[i,]
   d <- process_daily_data(paste0(.datPF,file[,]$name))
   fname <- str_sub(file$name, start = 12L, end = -5L)
-  fwrite(d, paste0(.outPF,"/daily-data/",fname,".csv"))
+  fwrite(d, paste0(.outPF,"daily-data/",fname,".csv"))
 }
 
 
