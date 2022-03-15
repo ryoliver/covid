@@ -75,12 +75,23 @@ evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   collect()
 
+
+reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
+
+# combine all data
 message("reading in safegraph data...")
-daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
+data_daily <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread),use.names = TRUE) %>%
   select(cbg,date,count) %>%
   rename(daily_count = count) %>%
   mutate(cbg = as.character(cbg),
          date = as.character(date))
+
+# OLD VERSION
+#daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
+#  select(cbg,date,count) %>%
+#  rename(daily_count = count) %>%
+#  mutate(cbg = as.character(cbg),
+#         date = as.character(date))
 
 #hourly_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_hour_SUM.csv")) %>%
 #  select(cbg,date,count) %>%
