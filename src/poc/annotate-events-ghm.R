@@ -104,5 +104,7 @@ head(evt_sf)
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
 
+dbDisconnect(db)
+
 message("intersection with human modification done!")
 

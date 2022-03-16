@@ -83,7 +83,6 @@ cbg_sf <- st_read(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometr
 message("reading in event table...")
 
 evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_clean') %>%
-  collect() %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
 #evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
@@ -101,6 +100,8 @@ head(evt_cbg)
 # write out new table with annotations
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+
+dbDisconnect(db)
 
 message("done!")
 

@@ -111,6 +111,8 @@ evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date
 message("writing out new event table...")
 dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
+dbDisconnect(db)
+
 message("safegraph annotation done!")
 
 
