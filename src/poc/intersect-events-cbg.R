@@ -54,7 +54,7 @@ if(interactive()) {
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod_20220303.db'
   .datPF <- file.path(.wd,'data/')
 }
 
@@ -89,19 +89,12 @@ evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_clean') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-message("select first 100 rows")
-test_sf <- evt_sf[1:100,]
-
-message("intersecting events with census block groups...")
-test_cbg <- st_intersection(test_sf,cbg_sf) %>%
-  rename(cbg_2010 = CensusBlockGroup) %>%
-  st_drop_geometry()
 
 # intersect event table with census block group geometries
-#message("intersecting events with census block groups...")
-#evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
-#  rename(cbg_2010 = CensusBlockGroup) %>%
-#  st_drop_geometry()
+message("intersecting events with census block groups...")
+evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
+  rename(cbg_2010 = CensusBlockGroup) %>%
+  st_drop_geometry()
 
 #head(evt_cbg)
 
