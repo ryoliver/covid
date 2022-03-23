@@ -89,17 +89,25 @@ evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_clean') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-# intersect event table with census block group geometries
+message("select first 100 rows")
+test_sf <- evt_sf[1:100,]
+
 message("intersecting events with census block groups...")
-evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
+test_cbg <- st_intersection(test_sf,cbg_sf) %>%
   rename(cbg_2010 = CensusBlockGroup) %>%
   st_drop_geometry()
 
-head(evt_cbg)
+# intersect event table with census block group geometries
+#message("intersecting events with census block groups...")
+#evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
+#  rename(cbg_2010 = CensusBlockGroup) %>%
+#  st_drop_geometry()
+
+#head(evt_cbg)
 
 # write out new table with annotations
-message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+#message("writing out new event table...")
+#dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 
