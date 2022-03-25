@@ -5,6 +5,7 @@ chmod +x /gpfs/ysm/project/jetz/ryo3/projects/covid/src/workflow/workflow_farnam
 src=/gpfs/ysm/project/jetz/ryo3/projects/covid/src
 
 #make executable
+chmod +x $src/workflow/create_intersection_joblist.R
 chmod +x $src/workflow/run_safegraph_processing.sh
 chmod +x $src/workflow/run_cbg_intersection.sh
 chmod +x $src/workflow/run_safegraph_annotation.sh
@@ -14,6 +15,12 @@ chmod +x $src/workflow/run_event_summary.sh
 chmod +x $src/workflow/run_dbbmm_test.sh
 
 #run
+
+module load R/4.1.0-foss-2020b
+Rscript $src/workflow/create_intersection_joblist.R
+
+module load dSQ
+dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2-
 
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
