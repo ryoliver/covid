@@ -68,7 +68,15 @@ suppressWarnings(
     library(sf)
   }))
 
+#---- Collect arguments ----#
+args = commandArgs(trailingOnly = TRUE)
+
+start_ix <- as.numeric(args[1])
+end_ix <- as.numeric(args[2])
+n <- as.numberic(args[3])
+
 #---- Initialize database ----#
+
 invisible(assert_that(file.exists(.dbPF)))
 
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
@@ -85,6 +93,8 @@ message("reading in event table...")
 evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_clean') %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
+evt_sf <- evt_sf[start_ix:end_ix,]
+
 #evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
@@ -100,7 +110,7 @@ evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
 
 # write out new table with annotations
 #message("writing out new event table...")
-#dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = paste0("event_cbg_",n), value = evt_cbg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

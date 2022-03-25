@@ -51,6 +51,7 @@ end_ix <- seq(from = n_events, to = n_total$num, by = n_events)
 
 joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; Rscript ",.wd,"/intersect-events-cbg.R "), times = n),
                       "arg1" = start_ix,
-                      "arg2" = end_ix)
+                      "arg2" = end_ix,
+                      "arg3" = seq(from = 1, to = n, by = 1))
 
 write.table(joblist,paste0(.outPF,"joblist.txt"),col.names = FALSE,row.names = FALSE,quote = FALSE)
