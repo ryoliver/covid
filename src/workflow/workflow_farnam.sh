@@ -22,7 +22,7 @@ Rscript $src/workflow/create_intersection_joblist.R
 module load dSQ
 dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2- 
 
-sbatch dsq-joblist-2022-04-01.sh
+sbatch dsq-joblist-2022-04-04.sh
 
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
