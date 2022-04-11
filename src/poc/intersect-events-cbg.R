@@ -54,7 +54,7 @@ if(interactive()) {
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod_20220303.db'
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
 }
 
