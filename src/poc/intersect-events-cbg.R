@@ -73,7 +73,7 @@ args = commandArgs(trailingOnly = TRUE)
 
 start_ix <- as.numeric(args[1])
 end_ix <- as.numeric(args[2])
-n <- as.numberic(args[3])
+n <- as.numeric(args[3])
 
 #---- Initialize database ----#
 
