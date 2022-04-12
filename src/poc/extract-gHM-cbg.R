@@ -38,8 +38,9 @@ source(file.path(.wd,'/src/startup.r'))
 suppressWarnings(
   suppressPackageStartupMessages({
     library(sf)
+    library(raster)
+    library(data.table)
   }))
-
 
 # read in census block group geometries
 message("reading in census block group geometries...")
