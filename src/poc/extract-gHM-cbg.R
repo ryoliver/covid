@@ -51,7 +51,7 @@ ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 cbg_ghm <- st_transform(cbg, crs = st_crs(ghm))
 
 cbg_ghm$ghm <- raster::extract(ghm,
-                                grid_ghm,
+                                cbg_ghm,
                                 fun = mean,
                                 na.rm = TRUE,
                                 weights = TRUE)
