@@ -14,7 +14,7 @@
 #     * StateFIPS (2 digit FIPS)
 #     * County (character string)
 #     * State (2 character code)
-#   *write out table with administrative info
+#   *write out csv with administrative info
 #
 # This script implements the breezy philosophy: github.com/benscarlson/breezy
 
@@ -110,7 +110,7 @@ evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
 
 # write out new table with annotations
 message("writing out csv...")
-fwrite(paste0(.outPF,"event-cbg-intersection-",n,".csv"))
+fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection-",n,".csv"))
 
 dbDisconnect(db)
 
