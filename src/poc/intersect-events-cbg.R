@@ -45,6 +45,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/event-cbg-intersection/')
 
 } else {
   library(docopt)
@@ -56,6 +57,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/event-cbg-intersection/')
 }
 
 source(file.path(.wd,'/src/startup.r'))
@@ -93,12 +95,12 @@ message("reading in event table...")
 evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_clean') %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-evt_sf <- evt_sf[start_ix:end_ix,]
-
 #evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
+
+evt_sf <- evt_sf[start_ix:end_ix,]
 
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
@@ -106,11 +108,9 @@ evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
   rename(cbg_2010 = CensusBlockGroup) %>%
   st_drop_geometry()
 
-#head(evt_cbg)
-
 # write out new table with annotations
-#message("writing out new event table...")
-dbWriteTable(conn = db, name = paste0("event_cbg_",n), value = evt_cbg, append = FALSE, overwrite = T)
+message("writing out csv...")
+fwrite(paste0(.outPF,"event-cbg-intersection-",n,".csv"))
 
 dbDisconnect(db)
 

@@ -16,14 +16,14 @@ chmod +x $src/workflow/run_dbbmm_test.sh
 chmod +x $src/workflow/run_extract_gHM.sh
 
 # intersect events with census geometries
-#module load R/4.1.0-foss-2020b
-#Rscript $src/workflow/create_intersection_joblist.R
+module load R/4.1.0-foss-2020b
+Rscript $src/workflow/create_intersection_joblist.R
 
-#module load dSQ
-#dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2- 
+module load dSQ
+dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2- 
 
 # UPDATE WITH DATE
-#sbatch dsq-joblist-2022-04-11.sh
+sbatch dsq-joblist-2022-04-13.sh
 
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
@@ -49,4 +49,4 @@ chmod +x $src/workflow/run_extract_gHM.sh
 #sbatch $src/workflow/run_dbbmm_test.sh
 
 # extract gHM from census geometries
-sbatch $src/workflow/run_extract_gHM.sh
+#sbatch $src/workflow/run_extract_gHM.sh
