@@ -7,7 +7,7 @@ src=/gpfs/ysm/project/jetz/ryo3/projects/covid/src
 #make executable
 chmod +x $src/workflow/create_intersection_joblist.R
 chmod +x $src/workflow/run_safegraph_processing.sh
-#chmod +x $src/workflow/run_cbg_intersection.sh
+chmod +x $src/workflow/run_cbg_annotation.sh
 chmod +x $src/workflow/run_safegraph_annotation.sh
 chmod +x $src/workflow/run_census_annotation.sh
 chmod +x $src/workflow/run_ghm_annotation.sh
@@ -27,6 +27,12 @@ chmod +x $src/workflow/run_compute_cbg_area.sh
 # UPDATE WITH DATE
 #sbatch dsq-joblist-2022-04-13.sh
 
+# compute area of census geometries
+#sbatch $src/workflow/run_compute_cbg_area.sh
+
+# annotate events with cbg info + area
+sbatch $src/workflow/run_cbg_annotation.sh
+
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
 
@@ -41,9 +47,6 @@ chmod +x $src/workflow/run_compute_cbg_area.sh
 
 # extract gHM from census geometries
 #sbatch $src/workflow/run_extract_gHM.sh
-
-# compute area of census geometries
-sbatch $src/workflow/run_compute_cbg_area.sh
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh

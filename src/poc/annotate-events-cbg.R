@@ -1,0 +1,92 @@
+#!/usr/bin/env Rscript --vanilla
+#
+# DESCRIPTION #
+#
+# This script links census geometry info with animal events for the COVID-19 Animal Movement Project
+# Event table is spatially intersected with census block group (cbg) geometries in intersect-events-cbg.R
+# Area for each geometry is computed in compute-cbg-area.R
+#
+# See project documentation for details about anticipated directory structure.
+# This script implements the breezy philosophy: github.com/benscarlson/breezy
+#
+# Major tasks fof this script:
+#   * combine event/cbg intersection files
+#   * read in cbg area
+#   * combine event table with associated cbgs and cbg area
+
+# ==== Breezy setup ====
+
+#'
+#Template
+#Usage:
+#script_template <taxa> <dat> <out> 
+#script_template (-h | --help)
+#Parameters:
+#  dat: path to input csv file. 
+#  out: path to output directory.
+#Options:
+#-h --help     Show this screen.
+#-v --version     Show version.
+#' -> doc
+
+#---- Input Parameters ----#
+if(interactive()) {
+  rm(list=ls())
+  library(here)
+  
+  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .test <- TRUE
+  rd <- here::here
+  
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .datPF <- file.path(.wd,'analysis/')
+  
+} else {
+  library(docopt)
+  library(rprojroot)
+  
+  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .script <-  thisfile()
+  rd <- is_rstudio_project$make_fix_file(.script)
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .datPF <- file.path(.wd,'analysis/')
+}
+
+message("start safegraph annotation")
+source(file.path(.wd,'/src/startup.r'))
+
+suppressWarnings(
+  suppressPackageStartupMessages({
+    library(DBI)
+    library(RSQLite)
+    library(data.table)
+  }))
+
+#---- Initialize database ----#
+invisible(assert_that(file.exists(.dbPF)))
+
+db <- dbConnect(RSQLite::SQLite(), .dbPF)
+
+invisible(assert_that(length(dbListTables(db))>0))
+
+message("reading in files...")
+files <- list.files(paste0(.datPF,"event-cbg-intersection/"),pattern = "*.csv",full.names = FALSE)
+intersection = data.table::rbindlist(lapply(files, data.table::fread),use.names = TRUE)
+
+area <- fread(paste0(.datPF,"cbg-area.csv")) %>%
+  select(cbg_2010, cbg_area_m2)
+
+message("reading in event table...")
+evt_df <- dbGetQuery(db,'SELECT event_id from event_clean')
+
+message("joining event table with cbg info..")
+evt_cbg <- evt_df %>%
+  left_join(., intersection, by = "event_id") %>%
+  left_join(., area, by = "cbg_2010")
+
+message("writing out new event table...")
+dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+
+dbDisconnect(db)
+
+message("cbg annotation done!")
