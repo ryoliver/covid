@@ -81,6 +81,6 @@ cbg <- cbg_sf %>%
   st_drop_geometry()
 
 message("writing out results...")
-fwrite(cbg, paste0(.outPF,"cbg-areas.csv"))
+fwrite(cbg, paste0(.outPF,"cbg-area.csv"))
 
 message("done!")

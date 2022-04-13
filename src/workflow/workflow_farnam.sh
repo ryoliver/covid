@@ -30,10 +30,6 @@ chmod +x $src/workflow/run_compute_cbg_area.sh
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
 
-# intersect events with census geometries
-# deprecated?
-#sbatch $src/workflow/run_cbg_intersection.sh
-
 # annotate events with safegraph data
 #sbatch $src/workflow/run_safegraph_annotation.sh
 
@@ -43,15 +39,15 @@ chmod +x $src/workflow/run_compute_cbg_area.sh
 # annotate events with census data
 #sbatch $src/workflow/run_ghm_annotation.sh
 
+# extract gHM from census geometries
+#sbatch $src/workflow/run_extract_gHM.sh
+
+# compute area of census geometries
+sbatch $src/workflow/run_compute_cbg_area.sh
+
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
 
 # summarize event data
 # deprecated?
 #sbatch $src/workflow/run_dbbmm_test.sh
-
-# extract gHM from census geometries
-#sbatch $src/workflow/run_extract_gHM.sh
-
-# compute area of census geometries
-sbatch $src/workflow/run_compute_cbg_area.sh
