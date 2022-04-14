@@ -48,6 +48,8 @@ cbg <- st_read(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometry/c
 
 ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
+ghm <- raster::crop(ghm,cbg)
+
 cbg_ghm <- st_transform(cbg, crs = st_crs(ghm))
 
 cbg_ghm$ghm <- raster::extract(ghm,
