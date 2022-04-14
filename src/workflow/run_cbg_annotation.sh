@@ -9,6 +9,6 @@
 #SBATCH --partition=general,pi_jetz
 #SBATCH -C avx2
 
-module load R
+module load R/4.1.0-foss-2020b
 
 Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/annotate-events-cbg.R
