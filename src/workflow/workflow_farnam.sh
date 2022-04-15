@@ -43,7 +43,7 @@ sbatch $src/workflow/run_cbg_annotation.sh
 #sbatch $src/workflow/run_census_annotation.sh
 
 # annotate events with census data
-#sbatch $src/workflow/run_ghm_annotation.sh
+sbatch $src/workflow/run_ghm_annotation.sh
 
 # extract gHM from census geometries
 #sbatch $src/workflow/run_extract_gHM.sh
