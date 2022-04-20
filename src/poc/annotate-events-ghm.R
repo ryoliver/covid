@@ -45,6 +45,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/')
   
 } else {
   library(docopt)
@@ -55,7 +56,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .outPF <- file.path(.wd,'analysis/')
 }
 
 source(file.path(.wd,'/src/startup.r'))
@@ -82,7 +83,7 @@ ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 # read in event table
 message("reading in event table...")
-evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
+evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_clean') %>%
   collect() %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
@@ -98,11 +99,12 @@ evt_sf$ghm <- raster::extract(ghm,evt_sf)
 evt_ghm <- evt_sf %>%
   st_drop_geometry()
 
-head(evt_sf)
+head(evt_ghm)
 
 # write out new table with annotations
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
+fwrite(evt_ghm, paste0(.outPF, "event_ghm.csv"))
+#dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

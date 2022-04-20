@@ -40,6 +40,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'analysis/event-annotations/')
   
 } else {
   library(docopt)
@@ -50,6 +51,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'analysis/')
 }
 
 message("start safegraph annotation")
@@ -71,19 +73,20 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in files...")
 files <- list.files(paste0(.datPF,"event-cbg-intersection/"),pattern = "*.csv",full.names = TRUE)
-intersection = data.table::rbindlist(lapply(files, data.table::fread),use.names = TRUE)
+intersection = data.table::rbindlist(lapply(files, data.table::fread, colClasses = "character"),use.names = TRUE)
 
 data_counties <- intersection %>%
-  distinct(CountyFIPS)
+  unite(col = "county", StateFIPS:CountyFIPS, sep ="") %>%
+  distinct(county)
 
 data_cbg <- intersection %>%
   distinct(cbg_2010) %>%
   rename(CensusBlockGroup = cbg_2010)
 
-fwrite(data_counties, paste0(.datPF,"counties-list.csv"))
-fwrite(data_cbg, paste0(.datPF,"census-block-group-list.csv"))
+fwrite(data_counties, paste0(.outPF,"safegraph-summary/counties-list.csv"))
+fwrite(data_cbg, paste0(.outPF,"safegraph-summary/census-block-group-list.csv"))
 
-area <- fread(paste0(.datPF,"cbg-area.csv")) %>%
+area <- fread(paste0(.datPF,"event-annotations/cbg-area.csv")) %>%
   select(cbg_2010, cbg_area_m2)
 
 message("reading in event table...")
@@ -95,7 +98,8 @@ evt_cbg <- evt_df %>%
   left_join(., area, by = "cbg_2010")
 
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
+fwrite(evt_cbg, paste0(.outPF, "event-annotations/event_cbg.csv"))
+#dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

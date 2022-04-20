@@ -16,6 +16,23 @@ chmod +x $src/workflow/run_dbbmm_test.sh
 chmod +x $src/workflow/run_extract_gHM.sh
 chmod +x $src/workflow/run_compute_cbg_area.sh
 
+# data wrangling workflow
+
+# step 1: intersect events with cbg geometries
+#   inputs - event table + cbg shp file
+#   outputs - csv per job (event_id + cbg info)
+
+# step 2: compute cbg area
+#   inputs - cbg shp files
+#   outputs - csv (cbg info + area)
+
+# step 3: annotate events with cbg info
+#   inputs - event table + cbg intersection csv + cbg area csv
+#   outputs - csv (event_id + cbg info + cbg area)
+
+# step 4: process safegraph data
+#   inputs - 
+
 
 # intersect events with census geometries
 #module load R/4.1.0-foss-2020b
@@ -41,7 +58,7 @@ sbatch $src/workflow/run_annotate_events_cbg.sh
 
 # annotate events with census data
 #sbatch $src/workflow/run_annotate_events_census.sh
-
+  
 # annotate events with census data
 sbatch $src/workflow/run_annotate_events_ghm.sh
 

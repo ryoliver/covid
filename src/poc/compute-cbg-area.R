@@ -44,7 +44,7 @@ if(interactive()) {
   rd <- here::here
   
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'analysis/event-annotations/')
   
 } else {
   library(docopt)
@@ -55,7 +55,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'analysis/event-annotations/')
 }
 
 source(file.path(.wd,'/src/startup.r'))
