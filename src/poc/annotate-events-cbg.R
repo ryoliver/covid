@@ -40,7 +40,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/event-annotations/')
+  .outPF <- file.path(.wd,'analysis/')
   
 } else {
   library(docopt)

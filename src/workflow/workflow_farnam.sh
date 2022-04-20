@@ -6,15 +6,16 @@ src=/gpfs/ysm/project/jetz/ryo3/projects/covid/src
 
 #make executable
 chmod +x $src/workflow/create_intersection_joblist.R
-chmod +x $src/workflow/run_safegraph_processing.sh
-chmod +x $src/workflow/run_cbg_annotation.sh
-chmod +x $src/workflow/run_safegraph_annotation.sh
-chmod +x $src/workflow/run_census_annotation.sh
-chmod +x $src/workflow/run_ghm_annotation.sh
-chmod +x $src/workflow/run_event_summary.sh
-chmod +x $src/workflow/run_dbbmm_test.sh
-chmod +x $src/workflow/run_extract_gHM.sh
+chmod +x $src/workflow/run_annotate_events_cbg.sh
+chmod +x $src/workflow/run_annotate_events_census.sh
+chmod +x $src/workflow/run_annotate_events_ghm.sh
+chmod +x $src/workflow/run_cbg_intersection.sh
 chmod +x $src/workflow/run_compute_cbg_area.sh
+chmod +x $src/workflow/run_event_summary.sh
+chmod +x $src/workflow/run_extract_gHM_cbg.sh
+chmod +x $src/workflow/run_safegraph_annotation.sh
+chmod +x $src/workflow/run_safegraph_processing.sh
+
 
 # data wrangling workflow
 
@@ -60,7 +61,7 @@ sbatch $src/workflow/run_annotate_events_cbg.sh
 #sbatch $src/workflow/run_annotate_events_census.sh
   
 # annotate events with census data
-sbatch $src/workflow/run_annotate_events_ghm.sh
+#sbatch $src/workflow/run_annotate_events_ghm.sh
 
 # extract gHM from census geometries
 #sbatch $src/workflow/run_extract_gHM_cbg.sh
