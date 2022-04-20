@@ -94,6 +94,7 @@ evt_df <- dbGetQuery(db,'SELECT event_id from event_clean')
 
 message("joining event table with cbg info..")
 evt_cbg <- evt_df %>%
+  mutate(event_id = as.character(event_id)) %>%
   left_join(., intersection, by = "event_id") %>%
   left_join(., area, by = "cbg_2010")
 
