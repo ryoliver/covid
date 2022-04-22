@@ -104,7 +104,7 @@ head(evt_ghm)
 
 # write out new table with annotations
 message("writing out new event table...")
-fwrite(evt_ghm, paste0(.outPF, "event_ghm.csv"))
+fwrite(evt_ghm, paste0(.outPF, "event-annotations/event_ghm.csv"))
 #dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
