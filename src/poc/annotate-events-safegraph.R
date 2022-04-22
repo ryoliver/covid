@@ -70,7 +70,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_cbg') %>%
+evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_clean') %>%
   separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   collect()
