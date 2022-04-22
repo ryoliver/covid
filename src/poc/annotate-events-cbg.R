@@ -86,7 +86,7 @@ data_cbg <- intersection %>%
 fwrite(data_counties, paste0(.outPF,"safegraph-summary/counties-list.csv"))
 fwrite(data_cbg, paste0(.outPF,"safegraph-summary/census-block-group-list.csv"))
 
-area <- fread(paste0(.datPF,"event-annotations/cbg-area.csv")) %>%
+area <- fread(paste0(.datPF,"event-annotations/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
 message("reading in event table...")
