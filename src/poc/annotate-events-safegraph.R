@@ -39,6 +39,7 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
+  .outtPF <- file.path(.wd,'analysis/')
   
 } else {
   library(docopt)
@@ -50,6 +51,7 @@ if(interactive()) {
   # UPDATE VERSION!!!
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
+  .outtPF <- file.path(.wd,'analysis/')
 }
 
 message("start safegraph annotation")
@@ -113,7 +115,7 @@ evt_sg <- evt_df %>%
 #  select(-date,-date_hour)
 
 message("writing out new event table...")
-fwrite(evt_cbg, paste0(.outPF, "event-annotations/event_sg.csv"))
+fwrite(evt_sg, paste0(.outPF, "event-annotations/event_sg.csv"))
 
 #dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
