@@ -70,11 +70,12 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
+evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_cbg') %>%
   separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   collect()
 
+evt_cbg <- fread(paste0(.datPF, "event-annotations/event_cbg.csv"), colClasses = "character")
 
 reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
 
@@ -82,7 +83,7 @@ reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-
 message("reading in safegraph data...")
 daily_data <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread),use.names = TRUE) %>%
   select(cbg,date,count) %>%
-  rename(daily_count = count) %>%
+  rename(safegraph_daily_count = count) %>%
   mutate(cbg = as.character(cbg),
          date = as.character(date))
 
@@ -101,7 +102,10 @@ daily_data <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::
 #  mutate(cbg_2010 = as.character(cbg_2010))
 
 message("joining events with safegraph data...")
-evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
+evt_sg <- evt_df %>%
+  mutate(event_id = as.character(event_id)) %>%
+  left_join(.,evt_cbg, by = "event_id") %>%
+  left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
   select(-date)
 
 #evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date")) %>%
@@ -109,7 +113,9 @@ evt_sg <- left_join(evt_df,daily_data, by = c("cbg_2010" = "cbg", "date" = "date
 #  select(-date,-date_hour)
 
 message("writing out new event table...")
-dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
+fwrite(evt_cbg, paste0(.outPF, "event-annotations/event_sg.csv"))
+
+#dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

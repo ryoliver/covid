@@ -49,19 +49,19 @@ chmod +x $src/workflow/run_safegraph_processing.sh
 #sbatch $src/workflow/run_compute_cbg_area.sh
 
 # annotate events with cbg info + area
-sbatch $src/workflow/run_annotate_events_cbg.sh
+#sbatch $src/workflow/run_annotate_events_cbg.sh
 
 # process safegraph data
 #sbatch $src/workflow/run_safegraph_processing.sh
 
 # annotate events with safegraph data
-#sbatch $src/workflow/run_safegraph_annotation.sh
+sbatch $src/workflow/run_annotate_events_safegraph.sh
 
 # annotate events with census data
 #sbatch $src/workflow/run_annotate_events_census.sh
   
 # annotate events with census data
-sbatch $src/workflow/run_annotate_events_ghm.sh
+#sbatch $src/workflow/run_annotate_events_ghm.sh
 
 # extract gHM from census geometries
 #sbatch $src/workflow/run_extract_gHM_cbg.sh
