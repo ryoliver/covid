@@ -87,7 +87,8 @@ daily_data <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::
   select(cbg,date,count) %>%
   rename(safegraph_daily_count = count) %>%
   mutate(cbg_2010 = as.character(cbg),
-         date = as.character(date))
+         date = as.character(date)) %>%
+  select(-cbg)
 
 # OLD VERSION
 #daily_data <- fread(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/all_counties_cbg_day_SUM.csv")) %>%
