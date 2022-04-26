@@ -51,7 +51,7 @@ select_individual <- function(id){
   i <- indtb %>%
     filter(individual_id == id)
   
-  fwrite(i, paste0(.datPF,"individual-data-",id,".csv"))
+  fwrite(i, paste0(.outPF,"individual-data-",id,".csv"))
 }
 
 for(i in 1:length(ids)){
