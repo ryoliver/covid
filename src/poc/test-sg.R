@@ -63,4 +63,8 @@ summary <- left_join(old_summary, new_summary, by = "cbg") %>%
 message("sum:")
 sum(summary$diff)
 
+list <- fread(paste0(.datPF,"safegraph-summary/census-block-group-list.csv"), colClasses = "character")
+
+length(setdiff(list$CensusBlockGroup,new$cbg))
+
 
