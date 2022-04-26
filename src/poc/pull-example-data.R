@@ -43,6 +43,7 @@ evttb <- tbl(db,'event')
 ids <- c(1967914051,1967914129,160484522,160484522)
 
 select_individual <- function(id){
+  id <- ids[i]
   e <- evttb %>%
     filter(individual_id == id)
   
