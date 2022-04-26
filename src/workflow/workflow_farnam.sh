@@ -52,10 +52,10 @@ chmod +x $src/workflow/run_safegraph_processing.sh
 #sbatch $src/workflow/run_annotate_events_cbg.sh
 
 # process safegraph data
-#sbatch $src/workflow/run_safegraph_processing.sh
+sbatch $src/workflow/run_safegraph_processing.sh
 
 # annotate events with safegraph data
-sbatch $src/workflow/run_annotate_events_safegraph.sh
+#sbatch $src/workflow/run_annotate_events_safegraph.sh
 
 # annotate events with census data
 #sbatch $src/workflow/run_annotate_events_census.sh
