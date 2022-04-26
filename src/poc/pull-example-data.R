@@ -46,7 +46,7 @@ select_individual <- function(id){
   e <- evttb %>%
     filter(individual_id == id)
   
-  fwrite(e, paste0(.datPF,"event-data-",id,".csv"))
+  fwrite(e, paste0(.outPF,"event-data-",id,".csv"))
   
   i <- indtb %>%
     filter(individual_id == id)
