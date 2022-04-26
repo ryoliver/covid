@@ -83,7 +83,7 @@ reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-
 
 # combine all data
 message("reading in safegraph data...")
-daily_data <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread),use.names = TRUE) %>%
+daily_data <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread, colClasses = "character"),use.names = TRUE) %>%
   select(cbg,date,count) %>%
   rename(safegraph_daily_count = count) %>%
   mutate(cbg_2010 = as.character(cbg),
