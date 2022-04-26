@@ -89,4 +89,6 @@ chmod +x $src/workflow/run_test_sg.sh
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
 
-sbatch $src/workflow/run_test_sg.sh
+#sbatch $src/workflow/run_test_sg.sh
+
+sbatch $src/workflow/run_pull_example_data.sh
