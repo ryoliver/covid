@@ -20,7 +20,7 @@ if(interactive()) {
   .outPF <- file.path(.wd,'data/example-data/')
 }
 
-message("start safegraph annotation")
+message("start pulling individual example data")
 source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(

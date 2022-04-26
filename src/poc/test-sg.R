@@ -19,7 +19,7 @@ if(interactive()) {
   .datPF <- file.path(.wd,'analysis/')
 }
 
-message("start safegraph annotation")
+message("start safegraph data test")
 source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(
