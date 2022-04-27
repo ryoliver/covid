@@ -44,12 +44,14 @@ ids <- c(1967914051,1967914129,160484522,160484522)
 
 select_individual <- function(id){
   e <- evttb %>%
-    filter(individual_id == id)
+    filter(individual_id == id) %>%
+    collect()
   
   fwrite(e, paste0(.outPF,"event-data-",id,".csv"))
   
   i <- indtb %>%
-    filter(individual_id == id)
+    filter(individual_id == id) %>%
+    collect()
   
   fwrite(i, paste0(.outPF,"individual-data-",id,".csv"))
 }
