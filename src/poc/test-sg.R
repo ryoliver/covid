@@ -34,6 +34,13 @@ old <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread, 
   select(cbg,date,count) 
 
 
+list <- fread(paste0(.datPF,"safegraph-summary/census-block-group-list.csv"), colClasses = "character")
+
+missing <- data.frame(CensusBlockGroup = setdiff(list$CensusBlockGroup,new$cbg))
+
+fwrite(missing, paste0(.datPF,"safegraph-summary/missing-cbgs.csv"))
+
+if (1 ==2){
 reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-4-26-22-reformatted/daily-data"), full.names = TRUE)
 
 new <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread, colClasses = "character"),use.names = TRUE) %>%
@@ -63,8 +70,7 @@ summary <- left_join(old_summary, new_summary, by = "cbg") %>%
 message("sum:")
 sum(summary$diff)
 
-list <- fread(paste0(.datPF,"safegraph-summary/census-block-group-list.csv"), colClasses = "character")
 
 length(setdiff(list$CensusBlockGroup,new$cbg))
 
-
+}
