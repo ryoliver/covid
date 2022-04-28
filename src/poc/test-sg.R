@@ -15,7 +15,6 @@ if(interactive()) {
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
-  # UPDATE VERSION!!!
   .datPF <- file.path(.wd,'analysis/')
 }
 
@@ -36,7 +35,7 @@ old <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread, 
 
 list <- fread(paste0(.datPF,"safegraph-summary/census-block-group-list.csv"), colClasses = "character")
 
-missing <- data.frame(CensusBlockGroup = setdiff(list$CensusBlockGroup,new$cbg))
+missing <- data.frame(CensusBlockGroup = setdiff(list$CensusBlockGroup,old$cbg))
 
 fwrite(missing, paste0(.datPF,"safegraph-summary/missing-cbgs.csv"))
 
