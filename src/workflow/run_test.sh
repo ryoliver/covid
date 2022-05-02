@@ -9,7 +9,7 @@
 #SBATCH --partition=general,pi_jetz
 #SBATCH -C avx2
 
-module load conda
+module load miniconda
 conda activate move
 
 Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/plot-examples.R
