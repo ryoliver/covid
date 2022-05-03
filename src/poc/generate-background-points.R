@@ -76,7 +76,8 @@ for(i in 1:nrow(test)){
   ssf <- tr %>% 
     track_resample(rate = hours(24), tolerance = hours(24)) %>%
     steps_by_burst() %>%
-    random_steps(n_control = 15) 
+    random_steps(n_control = 15) %>%
+    mutate("individual_id" = rep(id, nrow(.)))
   
   fwrite(ssf, paste0(.outPF,'ssf-background-pts/individual-',id,".csv"))
   message(i)
