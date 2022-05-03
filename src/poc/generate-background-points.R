@@ -79,7 +79,7 @@ for(i in 1:nrow(test)){
     random_steps(n_control = 15) %>%
     mutate("individual_id" = rep(id, nrow(.)))
   
-  fwrite(ssf, paste0(.outPF,'ssf-background-pts/individual-',id,".csv"))
+  fwrite(ssf, paste0(.outPF,'ssf-background-pts/individual-files/individual-',id,".csv"))
   message(i)
 }
 
