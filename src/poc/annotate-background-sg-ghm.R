@@ -48,10 +48,10 @@ cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"))
 
 
 message("running intersection with cbg geometries...")
-evt_cbg <- st_intersection(evt,cbg_sf) 
-#%>%
-#  rename(cbg_2010 = CensusBlockGroup) %>%
-#  left_join(., cbg_area, by = "cbg_2010")
+evt_cbg <- st_intersection(evt,cbg_sf) %>%
+  rename(cbg_2010 = CensusBlockGroup) %>%
+  st_drop_geometry() %>%
+  left_join(., cbg_area, by = "cbg_2010")
 
 
 reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
@@ -76,14 +76,17 @@ ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 # transform to raster reference system
 message("transform event table...")
-evt_sg_ghm <- st_transform(evt_sg,st_crs(ghm))
+evt_ghm <- st_transform(evt,st_crs(ghm))
 
-evt_sg_ghm$ghm <- raster::extract(ghm,evt_sg_ghm)
+evt_ghm$ghm <- raster::extract(ghm,evt_ghm)
 
-evt_sg_ghm <- evt_sg_ghm %>%
-  st_drop_geometry()
+evt_ghm <- evt_ghm %>%
+  st_drop_geometry()  %>%
+  select(step_id)
 
-head(evt_sg_ghm)
+head(evt_ghm)
+
+evt_sg_ghm <- left_join(evt_sg, evt_ghm, by = "step_id")
 
 message("writing out new event table...")
-fwrite(evt_ghm, paste0(.outPF, "event-annotations/background_sg_ghm.csv"))
+fwrite(evt_sg_ghm, paste0(.outPF, "event-annotations/background_sg_ghm.csv"))
