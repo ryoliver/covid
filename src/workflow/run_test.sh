@@ -12,4 +12,4 @@
 module load miniconda
 conda activate move
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/generate-background-points.R
+Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/annotate-background-sg-ghm.R
