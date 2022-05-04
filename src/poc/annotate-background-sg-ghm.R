@@ -36,7 +36,7 @@ suppressWarnings(
 
 files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.names = TRUE)
 
-evttb <- data.table::rbindlist(lapply(files, data.table::fread)) %>%
+evt <- data.table::rbindlist(lapply(files, data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
          "date" = as.character(as_date(t2_))) %>%
   st_as_sf(coords = c("x2_","y2_"), crs="+proj=longlat +datum=WGS84", remove = FALSE)
@@ -48,7 +48,7 @@ cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"))
 
 
 message("running intersection with cbg geometries...")
-evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
+evt_cbg <- st_intersection(evt,cbg_sf) %>%
   rename(cbg_2010 = CensusBlockGroup) %>%
   left_join(., cbg_area, by = "cbg_2010")
 
