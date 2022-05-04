@@ -43,7 +43,7 @@ evttb <- data.table::rbindlist(lapply(files, data.table::fread)) %>%
 
 
 message("reading in census block group geometries...")
-cbg_sf <- st_read(paste0(.wd,"data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
+cbg_sf <- st_read(paste0(.wd,"/data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
 cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"))
 
 
