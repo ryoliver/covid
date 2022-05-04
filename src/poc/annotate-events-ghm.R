@@ -96,7 +96,6 @@ evt_sf <- st_transform(evt_sf,st_crs(ghm))
 message("intersecting events with human modification...")
 evt_sf$ghm <- raster::extract(ghm,evt_sf)
 
-# intersect event table with census block group geometries
 evt_ghm <- evt_sf %>%
   st_drop_geometry()
 
