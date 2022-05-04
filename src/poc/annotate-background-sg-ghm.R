@@ -48,9 +48,10 @@ cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"))
 
 
 message("running intersection with cbg geometries...")
-evt_cbg <- st_intersection(evt,cbg_sf) %>%
-  rename(cbg_2010 = CensusBlockGroup) %>%
-  left_join(., cbg_area, by = "cbg_2010")
+evt_cbg <- st_intersection(evt,cbg_sf) 
+#%>%
+#  rename(cbg_2010 = CensusBlockGroup) %>%
+#  left_join(., cbg_area, by = "cbg_2010")
 
 
 reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
