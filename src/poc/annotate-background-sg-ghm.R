@@ -31,6 +31,7 @@ suppressWarnings(
     library(data.table)
     library(lubridate)
     library(sf)
+    library(raster)
   }))
 
 
