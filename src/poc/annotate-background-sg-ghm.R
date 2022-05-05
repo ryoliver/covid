@@ -84,7 +84,7 @@ evt_ghm$ghm <- raster::extract(ghm,evt_ghm)
 
 evt_ghm <- evt_ghm %>%
   st_drop_geometry()  %>%
-  select(step_id)
+  select(step_id, ghm)
 
 head(evt_ghm)
 
