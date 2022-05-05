@@ -74,7 +74,7 @@ evt_sg <- left_join(evt_cbg,daily_data, by = c("cbg_2010", "date")) %>%
 
 # read in global human modification layer
 message("reading in human modification...")
-ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
+ghm <- raster(paste0(.wd,"/data/gHM/gHM.tif"))
 
 # transform to raster reference system
 message("transform event table...")
