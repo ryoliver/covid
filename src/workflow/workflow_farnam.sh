@@ -72,7 +72,7 @@ chmod +x $src/workflow/run_test_sg.sh
 #sbatch $src/workflow/run_annotate_events_cbg.sh
 
 # process safegraph data
-#sbatch $src/workflow/run_safegraph_processing.sh
+sbatch $src/workflow/run_process_safegraph_data.sh
 
 # annotate events with safegraph data
 #sbatch $src/workflow/run_annotate_events_safegraph.sh
@@ -93,5 +93,5 @@ chmod +x $src/workflow/run_test_sg.sh
 
 #sbatch $src/workflow/run_pull_example_data.sh
 
-sbatch $src/workflow/run_test.sh
+#sbatch $src/workflow/run_test.sh
 

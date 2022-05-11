@@ -91,7 +91,7 @@ counties <- unique(files$county_id)
 # function for processing daily data
 process_daily_data <- function(file_name){
   # read in file
-  d <- fread(paste0(.datPF,file[,]$name)) %>%
+  d <- fread(paste0(.datPF,file[,]$name), colClasses = "character") %>%
     # rename census block group column
     rename("cbg" = "V1") %>%
     # convert from "wide" to "long" format

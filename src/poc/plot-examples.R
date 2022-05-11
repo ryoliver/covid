@@ -8,7 +8,9 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .datPF <- file.path(.wd,'data/example-data/')
+  .datPF <- file.path(.wd,'analysis/event-annotations/')
+  .outPF <- file.path(.wd,'analysis/figures/ssf-examples/')
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
 } else {
   library(docopt)
@@ -17,94 +19,64 @@ if(interactive()) {
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
-  .datPF <- file.path(.wd,'data/example-data/')
+  .datPF <- file.path(.wd,'analysis/event-annotations/')
 }
 
 source(file.path(.wd,'/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
-    #library(sf)
-    #library(data.table)
-    #library(lubridate)
-    #library(leaflet)
-    #library(mapview)
-    #library(magick)
-    #library(amt)
+    library(sf)
+    library(data.table)
+    library(lubridate)
+    library(tidyverse)
+    library(cowplot)
+    library(DBI)
+    library(RSQLite)
   }))
-library(amt)
-message("worked!")
 
-if(1==2){
-setwd(.datPF)
+message("connect to db...")
+db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
-files <- data.frame("name" = list.files(.datPF)) %>%
-  # separate file name into start date, county id, and resolution
-  separate(name,into = c("tb",NA,NA), sep = "-", remove = FALSE) 
+indtb <- tbl(db,'individual')
 
-files_evt <- files %>%
-  filter(tb == "event")
-
-files_ind <- files %>%
-  filter(tb == "individual")
-
-evttb <- data.table::rbindlist(lapply(files_evt$name, data.table::fread, colClasses = "character"))
-indtb <- data.table::rbindlist(lapply(files_ind$name, data.table::fread, colClasses = "character")) %>%
-  select(individual_id, taxon_canonical_name)
-
-evt <- left_join(evttb, indtb, by = "individual_id") %>%
-  mutate("date_time" = as_datetime(timestamp),
-         "date" = as_date(timestamp),
-         "year" = lubridate::year(date),
-         "doy" = lubridate::yday(date),
-         "lat" = as.numeric(lat),
-         "lon" = as.numeric(lon)) %>%
-  filter(year >= 2019) %>%
-  filter(year <= 2020) %>%
-  filter(doy < 170) %>%
-  distinct(individual_id, date, .keep_all = TRUE)
+evt <- fread(paste0(.datPF,"background_sg_ghm.csv")) %>%
+  mutate("sg_norm" = safegraph_daily_count/cbg_area_m2,
+         "year" = lubridate::year(t2_),
+         "doy" = lubridate::yday(t2_)) %>%
+  st_as_sf(coords = c("x2_", "y2_"),
+           crs = "+proj=longlat +datum=WGS84",
+           remove = FALSE)
 
 
+ids <- unique(evt$individual_id)
 
-evt_sf <- st_as_sf(evt, coords = c("lon", "lat"),
-                   crs = "+proj=longlat +datum=WGS84",
-                   remove = FALSE)
+for(i in 1:length(ids)){
+id <- ids[i]
 
-
-ids <- unique(indtb$individual_id)
-
-
-
-id <- ids[1]
+ind_info <- indtb %>% 
+  filter(individual_id == id) %>% 
+  select(taxon_canonical_name) %>% 
+  collect()
 
 e <- evt %>%
   filter(individual_id == id)
 
-tr <- make_track(e, lon, lat, date_time, indvidual_id = individual_id, event_id = event_id)
-ssf <- tr %>% 
-  track_resample(rate = hours(24), tolerance = hours(24)) %>%
-  steps_by_burst() %>%
-  random_steps(n_control = 15)
-
-
-
-
-plat <- ggplot(data = subset(evt, individual_id == id)) +
-  geom_point(aes(x = doy, y = lat, group = as.factor(year), color = as.factor(year))) +
-  geom_line(aes(x = doy, y = lat, group = as.factor(year), color = as.factor(year))) +
-  scale_color_manual(values = c("#FF6542","#86BBD8")) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+pmap <- ggplot() +
+  geom_sf(data = subset(e, case_ == FALSE), color = "grey", alpha = 0.5) +
+  geom_sf(data = subset(e, case_ == TRUE), aes(color = as.factor(year)), alpha = 0.5) +
+  scale_color_manual(values = c("#FF6542","#86BBD8")) + 
   
-  theme_cowplot() +
-  theme(legend.title = element_blank(),
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8)) +
-  labs(x = "day of year", y = "latitude") 
+  theme(legend.position = "none", 
+        legend.key.width = unit(1.5,"cm"),
+        legend.title=element_text(size=8),
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  labs(title = ind_info$taxon_canonical_name)
 
-plon <- ggplot(data = subset(evt, individual_id == id)) +
-  geom_point(aes(x = doy, y = lon, group = as.factor(year), color = as.factor(year))) +
-  geom_line(aes(x = doy, y = lon, group = as.factor(year), color = as.factor(year))) +
+plat <- ggplot(data = subset(e, case_ == TRUE)) +
+  geom_point(aes(x = doy, y = y2_, group = as.factor(year), color = as.factor(year))) +
+  geom_line(aes(x = doy, y = y2_, group = as.factor(year), color = as.factor(year))) +
   scale_color_manual(values = c("#FF6542","#86BBD8")) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
@@ -113,42 +85,120 @@ plon <- ggplot(data = subset(evt, individual_id == id)) +
   theme(legend.title = element_blank(),
         axis.title = element_text(size = 9),
         axis.text = element_text(size = 8),
-        legend.position = ) +
+        legend.position = c(0.1,0.9)) +
+  labs(x = "day of year", y = "latitude") 
+
+plon <- ggplot(data = subset(e, case_ == TRUE)) +
+  geom_point(aes(x = doy, y = x2_, group = as.factor(year), color = as.factor(year))) +
+  geom_line(aes(x = doy, y = x2_, group = as.factor(year), color = as.factor(year))) +
+  scale_color_manual(values = c("#FF6542","#86BBD8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
   labs(x = "day of year", y = "longitude") 
 
-pal <- colorFactor(c("#FF6542","#86BBD8"), domain = c(2019, 2020))
 
-m <- leaflet() %>%
-  addProviderTiles(
-    "OpenStreetMap",
-    group = "OpenStreetMap") %>%
-  addCircleMarkers(data = subset(evt_sf, individual_id == id),
-                   color = ~pal(year),
-                   radius = 2)
+pghm <- ggplot(data = e) +
+  #geom_histogram(aes(x = ghm, y = ..density..,color = case_, fill = case_), alpha = 0.5) +
+  geom_density(aes(x = ghm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = c(0.1,0.9)) +
+  labs(x = "modification", y = "density", title = "all") 
 
-mapshot(m, file = "~/Desktop/m.jpg")
+pghm19 <- ggplot(data = subset(e, year == 2019)) +
+  geom_density(aes(x = ghm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
+  labs(x = "modification", y = "density", title = "2019") 
 
-pmap <- image_read("~/Desktop/m.jpg")
+pghm20 <- ggplot(data = subset(e, year == 2020)) +
+  geom_density(aes(x = ghm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
+  labs(x = "modification", y = "density", title = "2020") 
 
-p <- ggdraw() +
-  draw_image(pmap, y = 0, x = 0, width = 1/3, height = 1) +
-  draw_plot(plat, y = 0, x = 1/3, width = 1/3, height = 1) +
-  draw_plot(plon, y = 0, x = 2/3, width = 1/3, height = 1)
+psg <- ggplot(data = e) +
+  #geom_histogram(aes(x = sg_norm, y = ..density..,color = case_, fill = case_), alpha = 0.5) +
+  geom_density(aes(x = sg_norm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(trans = "log10", expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
+  labs(x = "mobility", y = "density", title = "all") 
 
+psg19 <- ggplot(data = subset(e, year == 2019)) +
+  geom_density(aes(x = sg_norm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(trans = "log10", expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
+  labs(x = "mobility", y = "density", title = "2019") 
 
+psg20 <- ggplot(data = subset(e, year == 2020)) +
+  geom_density(aes(x = sg_norm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(trans = "log10", expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_cowplot() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        legend.position = "none") +
+  labs(x = "mobility", y = "density", title = "2020") 
 
-pdf("~/Desktop/test.pdf", width = 12, height = 4)
+h <- 1/3
+pdf(paste0(.outPF,"individual-",id,".pdf"), width = 12, height = 12)
+print(
 ggdraw() +
-  draw_plot(p)
+  draw_plot(pmap, x = 0, y = 2*h, width = 1/3, height = h) +
+  draw_plot(plat, x = 1/3, y = 2*h, width = 1/3, height = h) +
+  draw_plot(plon, x = 2/3, y = 2*h, width = 1/3, height = h) +
+  draw_plot(pghm, x = 0, y = h, width = 1/2, height = h) +
+  draw_plot(psg, x = 1/2, y = h, width = 1/2, height = h) +
+  draw_plot(pghm19, x = 0, y = 0, width = 1/4, height = h) +
+  draw_plot(pghm20, x = 1/4, y = 0, width = 1/4, height = h) +
+  draw_plot(psg19, x = 1/2, y = 0, width = 1/4, height = h) +
+  draw_plot(psg20, x = 3/4, y = 0, width = 1/4, height = h))
 dev.off()
-
-p <- ggplot() +
-  geom_sf(data = subset(e, individual_id == id), aes(color = as.factor(year)), alpha = 0.5) +
-  scale_color_manual(values = c("#FF6542","#86BBD8")) + 
-  
-  theme(legend.position = "bottom", 
-        legend.key.width = unit(1.5,"cm"),
-        legend.title=element_text(size=8),
-        legend.margin=margin(0,0,0,0),
-        legend.box.margin=margin(-10,-10,-10,-10)) 
 }
+dbDisconnect(db)
+
+
+
