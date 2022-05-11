@@ -11,4 +11,4 @@
 
 module load R
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/reformat-mobility-data.R
+Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/process-safegraph-data.R
