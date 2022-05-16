@@ -87,7 +87,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 # read in census block group geometries
 message("reading in census block group geometries...")
-cbg_sf <- st_read(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
+cbg_sf <- read_sf(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
 
 # read in event table
 message("reading in event table...")
