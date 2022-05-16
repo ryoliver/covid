@@ -55,11 +55,8 @@ if(interactive()) {
   
   #source(rd('src/funs/input_parse.r'))
   
-  #.datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
-  #.outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
-  
-  .datPF <- file.path(.wd,'data/safegraph/counties-dates-4-26-22/')
-  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-4-26-22-reformatted/')
+  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
+  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
 }
 
 #---- Initialize Environment ----#
