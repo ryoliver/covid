@@ -50,7 +50,7 @@ chmod +x $src/workflow/run_test_sg.sh
 #   inputs - event table + cbg intersection csv + cbg area csv
 #   outputs - csv (event_id + cbg info + cbg area)
 
-sbatch $src/workflow/run_annotate_events_cbg.sh
+#sbatch $src/workflow/run_annotate_events_cbg.sh
 ###
 
 ###
@@ -66,7 +66,7 @@ sbatch $src/workflow/run_annotate_events_cbg.sh
 #   inputs - event table + cbg info csv + sg data csv
 #   outputs - csv (event_id + timestamp + cbg info = cbg area + sg count)
 
-#sbatch $src/workflow/run_annotate_events_safegraph.sh
+sbatch $src/workflow/run_annotate_events_safegraph.sh
 ###
 
 ###
