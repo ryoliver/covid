@@ -58,7 +58,7 @@ chmod +x $src/workflow/run_test_sg.sh
 #   inputs - sg txt files (one file per cbg/week)
 #   outputs - csv (one file per cbg/week)
 
-sbatch $src/workflow/run_process_safegraph_data.sh
+#sbatch $src/workflow/run_process_safegraph_data.sh
 ###
 
 ###
@@ -66,7 +66,7 @@ sbatch $src/workflow/run_process_safegraph_data.sh
 #   inputs - event table + cbg info csv + sg data csv
 #   outputs - csv (event_id + timestamp + cbg info = cbg area + sg count)
 
-#sbatch $src/workflow/run_annotate_events_safegraph.sh
+sbatch $src/workflow/run_annotate_events_safegraph.sh
 ###
 
 ###
