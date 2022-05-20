@@ -1,0 +1,132 @@
+---
+title: "SSF examples"
+output: pdf_document
+theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE}
+rm(list=ls())
+.wd <- '~/Documents/Yale/projects/covid'
+.datPF <- file.path(.wd,'analysis/event-annotations/')
+source(file.path(.wd,'/src/startup.r'))
+
+suppressWarnings(
+  suppressPackageStartupMessages({
+    library(sf)
+    library(data.table)
+    library(lubridate)
+    library(tidyverse)
+    library(amt)
+  }))
+
+evt <- fread(paste0(.datPF,"background_sg_ghm.csv")) %>%
+  mutate("sg_norm" = safegraph_daily_count/cbg_area_m2,
+         "year" = lubridate::year(t2_),
+         "doy" = lubridate::yday(t2_)) %>%
+  st_as_sf(coords = c("x2_", "y2_"),
+           crs = "+proj=longlat +datum=WGS84",
+           remove = FALSE)
+
+id <- 135997750
+
+e <- evt %>%
+  filter(individual_id == id)
+
+```
+
+## Background info
+
+Maps and time series of location data. Grey points show randomly generated "available" points for each step.
+
+```{r echo=FALSE}
+ggplot() +
+  geom_sf(data = subset(e, case_ == FALSE), color = "grey", alpha = 0.5) +
+  geom_sf(data = subset(e, case_ == TRUE), aes(color = as.factor(year)), alpha = 0.5) +
+  scale_color_manual(values = c("#FF6542","#86BBD8")) + 
+  
+  theme(legend.key.width = unit(1.5,"cm"),
+        legend.title=element_blank(),
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,-10,-10,-10)) 
+
+```
+
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+ggplot(data = subset(e, case_ == TRUE)) +
+  geom_point(aes(x = doy, y = y2_, group = as.factor(year), color = as.factor(year))) +
+  geom_line(aes(x = doy, y = y2_, group = as.factor(year), color = as.factor(year))) +
+  scale_color_manual(values = c("#FF6542","#86BBD8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = c(0.1,0.9)) +
+  labs(x = "day of year", y = "latitude") 
+
+ggplot(data = subset(e, case_ == TRUE)) +
+  geom_point(aes(x = doy, y = x2_, group = as.factor(year), color = as.factor(year))) +
+  geom_line(aes(x = doy, y = x2_, group = as.factor(year), color = as.factor(year))) +
+  scale_color_manual(values = c("#FF6542","#86BBD8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none") +
+  labs(x = "day of year", y = "longitude") 
+
+
+```
+
+## Step selection analysis
+
+Distribution of modification and mobility values for used vs. available points
+
+```{r echo=FALSE, warning=FALSE,fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
+
+ggplot(data = e) +
+  geom_density(aes(x = ghm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = c(0.1,0.9)) +
+  labs(x = "modification", y = "density") 
+
+ggplot(data = e) +
+  geom_density(aes(x = sg_norm,color = case_, fill = case_), alpha = 0.5) +
+  scale_fill_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_color_manual(values = c("#5B2A86","#9AC6C5")) +
+  scale_x_continuous(trans = "log10", expand = expansion(mult = c(0, 0.01))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none") +
+  labs(x = "mobility", y = "density") 
+
+```
+
+```{r echo=FALSE, warning=FALSE}
+m <- e %>% fit_clogit(case_ ~ sg_norm*ghm + strata(step_id_))
+
+```
+
+
+```{r echo=FALSE, warning=FALSE}
+summary(m)
+```
