@@ -108,7 +108,7 @@ evt_summary <- evt_grid %>%
 
 # write out new table with annotations
 message("writing out csv...")
-fwrite(evt_cbg, paste0(.outPF,"event-summary-1440grid.csv"))
+fwrite(evt_summary, paste0(.outPF,"event-summary-1440grid.csv"))
 
 dbDisconnect(db)
 
