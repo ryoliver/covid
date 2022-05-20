@@ -101,7 +101,7 @@ evt_summary <- evt_grid %>%
   st_drop_geometry() %>%
   left_join(., ind_tb, by = "individual_id") %>%
   group_by(ID_1440) %>%
-  summary("n_events" = n(),
+  summarize("n_events" = n(),
           "n_individuals" = n_distinct(individual_id),
           "n_species" = n_distinct(taxon_canonical_name))
 
