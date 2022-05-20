@@ -87,7 +87,8 @@ grid <- st_read(paste0(.datPF,"1440x456global_v2_20200527/1440x456global_2020052
 message("reading in event table...")
 
 evt_sf <- dbGetQuery(db,'SELECT event_id,individual_id,lat,lon from event_clean') %>%
-  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
+  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84") %>%
+  st_transform(., st_crs(grid))
 
 ind_tb <- dbGetQuery(db, 'SELECT individual_id,taxon_canonical_name from individual')
 
