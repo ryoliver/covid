@@ -10,12 +10,10 @@ chmod +x $src/workflow/run_annotate_events_cbg.sh
 chmod +x $src/workflow/run_annotate_events_census.sh
 chmod +x $src/workflow/run_annotate_events_ghm.sh
 chmod +x $src/workflow/run_annotate_events_safegraph.sh
-chmod +x $src/workflow/run_cbg_intersection.sh
 chmod +x $src/workflow/run_compute_cbg_area.sh
 chmod +x $src/workflow/run_event_summary.sh
 chmod +x $src/workflow/run_extract_gHM_cbg.sh
 chmod +x $src/workflow/run_process_safegraph_data.sh
-chmod +x $src/workflow/run_test_sg.sh
 
 
 # ---- data wrangling workflow -----
@@ -95,13 +93,23 @@ chmod +x $src/workflow/run_test_sg.sh
 ###
 
 
+# ---- SSF workflow -----
+
+
+###
+# step 1: generate background points
+#   inputs - event table + individual table
+#   outputs - csv per individual
+
+#sbatch $src/workflow/run_generate_background_points.sh
+
+
+
+# ---- testing ground -----
+
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
-
-#sbatch $src/workflow/run_test_sg.sh
-
-#sbatch $src/workflow/run_pull_example_data.sh
 
 sbatch $src/workflow/run_test.sh
 

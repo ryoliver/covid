@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=safegraph_intersection
+#SBATCH --job-name=bckgrnd-pts
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ruth.oliver@yale.edu
@@ -9,6 +9,7 @@
 #SBATCH --partition=general,bigmem,pi_jetz
 #SBATCH -C avx2
 
-module load R/4.1.0-foss-2020b
+module load miniconda
+conda activate move
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/intersect-events-cbg.R
+Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/generate-background-points.R

@@ -33,6 +33,7 @@ suppressWarnings(
     library(amt)
     library(DBI)
     library(RSQLite)
+    library(sf)
   }))
 
 message("connect to db...")
@@ -68,21 +69,45 @@ for(i in 1:nrow(test)){
            "lon" = as.numeric(lon)) %>%
     filter(year >= 2019) %>%
     filter(year <= 2020) %>%
-    filter(doy < 170) %>%
+    filter(doy < 170) 
+  
+  e1 <- e %>%
     distinct(date, .keep_all = TRUE)
   
-  tr <- make_track(e, lon, lat, date_time, event_id = event_id)
+  tr1 <- make_track(e1, lon, lat, date_time, event_id = event_id)
   
-  ssf <- tr %>% 
+  ssf1 <- tr1 %>% 
     track_resample(rate = hours(24), tolerance = hours(24)) %>%
     steps_by_burst() %>%
     random_steps(n_control = 15) %>%
     mutate("individual_id" = rep(id, nrow(.)))
   
-  fwrite(ssf, paste0(.outPF,'ssf-background-pts/individual-files/individual-',id,".csv"))
+  fwrite(ssf1, paste0(.outPF,'ssf-background-pts/individual-files/traditional-approach/individual-',id,".csv"))
+  
+  
+  
+  e2 <- e %>%
+    st_as_sf(., coords = c("lon", "lat")) %>%
+    filter(date == "2020-01-01") %>%
+    dplyr::group_by(date) %>% 
+    summarize(geometry = st_union(geometry)) %>% 
+    st_centroid()
+  
+  
+  tr2 <- make_track(e2, lon, lat, date)
+  
+  ssf2 <- tr2 %>% 
+    track_resample(rate = hours(24), tolerance = hours(24)) %>%
+    steps_by_burst() %>%
+    random_steps(n_control = 15) %>%
+    mutate("individual_id" = rep(id, nrow(.)))
+  
+  fwrite(ssf2, paste0(.outPF,'ssf-background-pts/individual-files/averaging-approach/individual-',id,".csv"))
+  
   message(i)
 }
 
 message("done!")
 #ids <- c(1967914051,1967914129,160484522,160484522,578909800)
 
+dbDisconnect(db)
