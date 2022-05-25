@@ -14,9 +14,10 @@ chmod +x $src/workflow/run_compute_cbg_area.sh
 chmod +x $src/workflow/run_event_summary.sh
 chmod +x $src/workflow/run_extract_gHM_cbg.sh
 chmod +x $src/workflow/run_process_safegraph_data.sh
+chmod +x $src/workflow/run_generate_centroids.sh
 
 
-# ---- data wrangling workflow -----
+# ---- data wrangling workflow ----- #
 
 
 ###
@@ -75,7 +76,7 @@ chmod +x $src/workflow/run_process_safegraph_data.sh
 #sbatch $src/workflow/run_annotate_events_ghm.sh
 ###
 
-# ---- optional steps ----
+# ---- optional steps ---- #
 ###
 # step 7: extract TNC global human modification layer to census geometries
 #   inputs - cbg shp file + ghm raster
@@ -93,23 +94,25 @@ chmod +x $src/workflow/run_process_safegraph_data.sh
 ###
 
 
-# ---- SSF workflow -----
+# ---- SSF workflow ----- #
 
 
 ###
-# step 1: generate background points
-#   inputs - event table + individual table
-#   outputs - csv per individual
+# step 1: generate centroids
+#   inputs - event annotations 
+#   outputs - shp file (individual_id, event_id, annotations)
 
-#sbatch $src/workflow/run_generate_background_points.sh
+### NEED TO UPDATE WITH ENVIRONMENTAL ANNOTATIONS
+
+sbatch $src/workflow/run_generate_centroids.sh
 
 
 
-# ---- testing ground -----
+# ---- testing ground ----- #
 
 
 # summarize event data
 #sbatch $src/workflow/run_event_summary.sh
 
-sbatch $src/workflow/run_test.sh
+#sbatch $src/workflow/run_test.sh
 
