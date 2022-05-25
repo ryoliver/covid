@@ -100,11 +100,19 @@ chmod +x $src/workflow/run_generate_centroids.sh
 ###
 # step 1: generate centroids
 #   inputs - event annotations 
-#   outputs - shp file (individual_id, event_id, annotations)
+#   outputs - csv (individual_id, event_id, lon, lat, annotations)
 
 ### NEED TO UPDATE WITH ENVIRONMENTAL ANNOTATIONS
 
 sbatch $src/workflow/run_generate_centroids.sh
+
+###
+# step 2: generate background points
+#   inputs - centroids csv (individual_id, event_id, lon, lat, annotations)
+#   outputs - individual csvs 
+
+
+#sbatch $src/workflow/run_generate_background_points.sh
 
 
 
