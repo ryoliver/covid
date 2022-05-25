@@ -65,10 +65,21 @@ evt <- dbGetQuery(db,'SELECT event_id,individual_id,lon,lat,timestamp from event
   summarize(ghm = mean(ghm, na.rm = TRUE),
             sg_norm = mean(sg_norm, na.rm = TRUE),
             geometry = st_union(geometry)) %>%
-  st_centroid()
+  st_centroid() %>%
+  st_transform(., crs="+proj=longlat +datum=WGS84") 
+
+message("extract coordinates...")
+coords <- st_coordinates(evt)
+
+evt <- cbind(evt,coords)
+
+evt <- evt %>%
+  st_drop_geometry() %>%
+  rename(lon = X,
+         lat = Y)
 
 message("write out centroid shp file...")
-st_write(e, paste0(.outPF,"ssf-background-pts/event-daily-centroids.shp"))
+st_write(e, paste0(.outPF,"ssf-background-pts/event-daily-centroids.csv"))
   
 dbDisconnect(db)
   
