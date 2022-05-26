@@ -37,32 +37,53 @@ suppressWarnings(
     library(RSQLite)
   }))
 
-message("read in centroids...")
 
-evt <- fread(paste0(.outPF,"ssf-background-pts/event-daily-centroids.csv"))
 
-ids <- unique(e$individual_id)
+db <- dbConnect(RSQLite::SQLite(), .dbPF)
+
+
+
+message("read in events and select random daily event...")
+evt <- dbGetQuery(db,'SELECT event_id,individual_id,lon,lat,timestamp from event_clean') %>%
+  collect() %>%
+  mutate("date" = as_date(timestamp),
+         "date_time" = as_datetime(timestamp),
+         "year" = lubridate::year(date),
+         "doy" = lubridate::yday(date)) %>%
+  filter(year >= 2019) %>% # lazy check on date filter
+  filter(year <= 2020) %>%
+  filter(doy < 170) %>%
+  group_by(individual_id, date) %>%  
+  sample_n(1) %>% # randomly select one event per day
+  ungroup()
+
+
+
+ids <- unique(evt$individual_id)
   
 for(i in 1:length(ids)){
   id <- ids[i]
   
+  # filter to individual
   e <- evt %>%
     filter(individual_id == id) 
   
-  tr <- make_track(e, lon, lat, date, 
-                   individual_id = individual_id,
-                   ghm = ghm,
-                   sg_norm = sg_norm)
+  # generate track
+  tr <- make_track(e, lon, lat, date_time, 
+                   individual_id = individual_id)
   
+  # generate background points
+  # CHECK TOLERANCE VALUE
   ssf <- tr %>% 
-    track_resample(rate = hours(24), tolerance = hours(24)) %>%
+    track_resample(rate = hours(24), tolerance = hours(22)) %>%
     steps_by_burst() %>%
     random_steps(n_control = 15) 
   
-  fwrite(ssf, paste0(.outPF,"ssf-background-pts/centroids-background/individual-",id,".csv"))
+  fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
   
-  message(i)
+  message(paste0((i/length(ids))*100, "% done"))
 }
+
 
 dbDisconnect(db)
 

@@ -43,6 +43,8 @@ grid <- st_read(paste0(.datPF,"1440x456global_v2_20200527/1440x456global_2020052
 message("connect to db...")
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
+
+# NEED TO ADD ENVIRONMENTAL ANNOTATIONS
 message("read in annotation files...")
 # events annotated with safegraph data
 evt_sg <- fread(paste0(.outPF,"event-annotations/event_sg.csv")) %>%
@@ -52,6 +54,8 @@ evt_sg <- fread(paste0(.outPF,"event-annotations/event_sg.csv")) %>%
 # events annotated with TNC global human modification
 evt_ghm <- fread(paste0(.outPF,"event-annotations/event_ghm.csv"))
 
+
+# NEED TO UPDATE LEFT JOIN AND SUMMARIZE WITH ENVIRONMENTAL ANNOTATIONS
 message("create centroids...")
 evt <- dbGetQuery(db,'SELECT event_id,individual_id,lon,lat,timestamp from event_clean') %>%
   collect() %>%

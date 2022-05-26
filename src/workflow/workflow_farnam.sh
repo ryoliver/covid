@@ -96,23 +96,13 @@ chmod +x $src/workflow/run_generate_centroids.sh
 
 # ---- SSF workflow ----- #
 
-
+# CHECK TOLERANCE
 ###
-# step 1: generate centroids
-#   inputs - event annotations 
-#   outputs - csv (individual_id, event_id, lon, lat, annotations)
-
-### NEED TO UPDATE WITH ENVIRONMENTAL ANNOTATIONS
-
-sbatch $src/workflow/run_generate_centroids.sh
-
-###
-# step 2: generate background points
-#   inputs - centroids csv (individual_id, event_id, lon, lat, annotations)
+# step 1: generate background points
+#   inputs - event table
 #   outputs - individual csvs 
 
-
-#sbatch $src/workflow/run_generate_background_points.sh
+sbatch $src/workflow/run_generate_background_points.sh
 
 
 
