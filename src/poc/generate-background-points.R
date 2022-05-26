@@ -81,7 +81,7 @@ for(i in 1:length(ids)){
   
   fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
   
-  message(paste0((i/length(ids))*100, "% done"))
+  message(id)
 }
 
 
