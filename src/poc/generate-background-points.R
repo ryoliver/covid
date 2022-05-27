@@ -69,7 +69,7 @@ for(i in 1:length(ids)){
   e <- evt %>%
     filter(individual_id == id) 
   
-  if (nrow(e) > 20){
+  if (nrow(e) >= 50){
     # generate track
     tr <- make_track(e, lon, lat, date_time, 
                      individual_id = individual_id)
