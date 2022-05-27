@@ -68,28 +68,35 @@ for(i in 1:length(ids)){
   e <- evt %>%
     filter(individual_id == id) 
   
-  # generate track
-  tr <- make_track(e, lon, lat, date_time, 
-                   individual_id = individual_id)
-  
-  # CHECK TOLERANCE VALUE
-  steps <- tr %>% 
-    track_resample(rate = hours(24), tolerance = hours(22)) %>%
-    steps_by_burst()
-  
-  # check number of rows with NA turning angle
-  test <- steps %>%
-    filter(is.na(ta_))
-  
-  if (nrow(test)/nrow(steps) < 0.5){
+  # filter to individuals with greater than 10 records
+  if (nrow(e) > 10){
     
-    # generate background points
-    ssf <- steps %>%
-      random_steps(n_control = 15) 
+    # generate track
+    tr <- make_track(e, lon, lat, date_time, 
+                     individual_id = individual_id)
     
-    fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+    # CHECK TOLERANCE VALUE
+    steps <- tr %>% 
+      track_resample(rate = hours(24), tolerance = hours(22)) %>%
+      steps_by_burst()
     
-    message(paste0(id,": worked"))
+    # check number of rows with NA turning angle
+    test <- steps %>%
+      filter(is.na(ta_))
+    
+    # filter to individuals with < 50% steps with NA turning angle
+    if (nrow(test)/nrow(steps) < 0.5){
+      
+      # generate background points
+      ssf <- steps %>%
+        random_steps(n_control = 15) 
+      
+      fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+      
+      message(paste0(id,": worked"))
+    } else{
+      message(paste0(id,": filtered"))
+    }
   } else{
     message(paste0(id,": filtered"))
   }
