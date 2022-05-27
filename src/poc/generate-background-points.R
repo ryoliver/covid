@@ -63,6 +63,7 @@ ids <- unique(evt$individual_id)
   
 for(i in 1:length(ids)){
   id <- ids[i]
+  message(id)
   
   # filter to individual
   e <- evt %>%
@@ -80,8 +81,6 @@ for(i in 1:length(ids)){
     random_steps(n_control = 15) 
   
   fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
-  
-  message(id)
 }
 
 
