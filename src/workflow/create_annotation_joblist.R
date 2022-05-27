@@ -30,7 +30,7 @@ suppressWarnings(
 
 
 
-files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.names = TRUE)
+files <- list.files(paste0(.wd,'/analysis/ssf-background-pts/individual-files'),full.names = TRUE)
 
 n_total <- length(files)
 
