@@ -7,7 +7,7 @@ if(interactive()) {
   rd <- here::here
   
   .datPF <- file.path(.wd,'src/poc/')
-  .outPF <- file.path(.wd,"analysis/")
+  .outPF <- file.path(.wd,"src/workflow/")
   
 } else {
   library(docopt)
@@ -18,7 +18,7 @@ if(interactive()) {
   rd <- is_rstudio_project$make_fix_file(.script)
   
   .datPF <- file.path(.wd,'src/poc/')
-  .outPF <- file.path(.wd,"analysis/")
+  .outPF <- file.path(.wd,"src/workflow/")
 }
 
 source(file.path(.wd,'/src/startup.r'))
