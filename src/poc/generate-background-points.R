@@ -63,28 +63,37 @@ ids <- unique(evt$individual_id)
   
 for(i in 1:length(ids)){
   id <- ids[i]
-  message(id)
   
   # filter to individual
   e <- evt %>%
     filter(individual_id == id) 
   
-  if (nrow(e) >= 50){
-    # generate track
-    tr <- make_track(e, lon, lat, date_time, 
-                     individual_id = individual_id)
+  # generate track
+  tr <- make_track(e, lon, lat, date_time, 
+                   individual_id = individual_id)
+  
+  # CHECK TOLERANCE VALUE
+  steps <- tr %>% 
+    track_resample(rate = hours(24), tolerance = hours(22)) %>%
+    steps_by_burst()
+  
+  # check number of rows with NA turning angle
+  test <- steps %>%
+    filter(is.na(ta_))
+  
+  if (nrow(test)/nrow(steps) < 0.5){
     
     # generate background points
-    # CHECK TOLERANCE VALUE
-    ssf <- tr %>% 
-      track_resample(rate = hours(24), tolerance = hours(22)) %>%
-      steps_by_burst() %>%
+    ssf <- steps %>%
       random_steps(n_control = 15) 
     
     fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+    
+    message(paste0(id,": worked"))
+  } else{
+    message(paste0(id,": filtered"))
   }
 }
-
 
 dbDisconnect(db)
 
