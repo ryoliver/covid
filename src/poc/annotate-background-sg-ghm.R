@@ -34,10 +34,18 @@ suppressWarnings(
     library(raster)
   }))
 
+#---- Collect arguments ----#
+args = commandArgs(trailingOnly = TRUE)
+
+start_ix <- as.numeric(args[1])
+end_ix <- as.numeric(args[2])
+n <- as.numeric(args[3])
+
+#---- Collect arguments ----#
 
 files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.names = TRUE)
 
-evt <- data.table::rbindlist(lapply(files, data.table::fread)) %>%
+evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
          "date" = as.character(as_date(t2_))) %>%
   st_as_sf(coords = c("x2_","y2_"), crs="+proj=longlat +datum=WGS84", remove = FALSE)
@@ -91,4 +99,4 @@ head(evt_ghm)
 evt_sg_ghm <- left_join(evt_sg, evt_ghm, by = "step_id")
 
 message("writing out new event table...")
-fwrite(evt_sg_ghm, paste0(.outPF, "event-annotations/background_sg_ghm.csv"))
+fwrite(evt_sg_ghm, paste0(.outPF, "event-annotations/ssf-background-points-annotations/individual-files/job-",n,".csv"))
