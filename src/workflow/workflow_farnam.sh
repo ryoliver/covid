@@ -116,7 +116,7 @@ module load dSQ
 dsq --job-file $src/workflow/annotation-joblist.txt --mem-per-cpu 100g -t 2- 
 
 # UPDATE WITH DATE
-sbatch dsq-joblist-2022-05-27.sh
+#sbatch dsq-joblist-2022-05-27.sh
 ###
 
 # ---- testing ground ----- #

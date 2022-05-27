@@ -39,7 +39,7 @@ n <- 100
 n_events <- floor(n_total/n)
 
 start_ix <- seq(from = 1, to = n*n_events, by = n_events)
-end_ix <- seq(from = n_events, to = n_total$num, by = n_events)
+end_ix <- seq(from = n_events, to = n_total, by = n_events)
 
 
 joblist <- data.frame("string" = rep(paste0(" module load miniconda; conda activate move; Rscript ",.datPF,"annotate-background-sg-ghm.R "), times = n),
