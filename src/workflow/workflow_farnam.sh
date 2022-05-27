@@ -102,9 +102,22 @@ chmod +x $src/workflow/run_generate_centroids.sh
 #   inputs - event table
 #   outputs - individual csvs 
 
-sbatch $src/workflow/run_generate_background_points.sh
+#sbatch $src/workflow/run_generate_background_points.sh
 
+###
+# step 2: annotate background points
+#   inputs - individual csvs
+#   outputs - csv per job (event_id + cbg info)
 
+module load R/4.1.0-foss-2020b
+Rscript $src/workflow/create_annotation_joblist.R
+
+module load dSQ
+dsq --job-file $src/workflow/annotation-joblist.txt --mem-per-cpu 100g -t 2- 
+
+# UPDATE WITH DATE
+sbatch dsq-joblist-2022-05-27.sh
+###
 
 # ---- testing ground ----- #
 
