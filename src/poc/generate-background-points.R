@@ -80,26 +80,31 @@ for(i in 1:length(ids)){
       track_resample(rate = hours(24), tolerance = hours(22)) %>%
       steps_by_burst()
     
-    # check number of rows with NA turning angle
-    test <- steps %>%
-      filter(is.na(ta_))
-    
-    # filter to individuals with < 50% steps with NA turning angle
-    if (nrow(test)/nrow(steps) < 0.5){
+    # filter to individuals with steps (i.e. consistent data)
+    if (nrow(steps) > 0){
+      # check number of rows with NA turning angle
+      test <- steps %>%
+        filter(is.na(ta_))
       
-      # generate background points
-      ssf <- steps %>%
-        random_steps(n_control = 15) 
-      
-      fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
-      
-      message(paste0(id,": worked"))
+      # filter to individuals with < 50% steps with NA turning angle
+      if (nrow(test)/nrow(steps) < 0.5){
+        
+        # generate background points
+        ssf <- steps %>%
+          random_steps(n_control = 15) 
+        
+        fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+        
+        message(paste0(id,": worked"))
+      } else{
+        message(paste0(id,": filtered"))
+      }
     } else{
       message(paste0(id,": filtered"))
     }
   } else{
     message(paste0(id,": filtered"))
-  }
+    }
 }
 
 dbDisconnect(db)
