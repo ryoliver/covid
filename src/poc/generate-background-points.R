@@ -69,18 +69,20 @@ for(i in 1:length(ids)){
   e <- evt %>%
     filter(individual_id == id) 
   
-  # generate track
-  tr <- make_track(e, lon, lat, date_time, 
-                   individual_id = individual_id)
-  
-  # generate background points
-  # CHECK TOLERANCE VALUE
-  ssf <- tr %>% 
-    track_resample(rate = hours(24), tolerance = hours(22)) %>%
-    steps_by_burst() %>%
-    random_steps(n_control = 15) 
-  
-  fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+  if (nrow(e) > 20){
+    # generate track
+    tr <- make_track(e, lon, lat, date_time, 
+                     individual_id = individual_id)
+    
+    # generate background points
+    # CHECK TOLERANCE VALUE
+    ssf <- tr %>% 
+      track_resample(rate = hours(24), tolerance = hours(22)) %>%
+      steps_by_burst() %>%
+      random_steps(n_control = 15) 
+    
+    fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+  }
 }
 
 
