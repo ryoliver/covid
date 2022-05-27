@@ -63,7 +63,7 @@ ids <- unique(evt$individual_id)
   
 for(i in 1:length(ids)){
   id <- ids[i]
-  
+  message(id)
   # filter to individual
   e <- evt %>%
     filter(individual_id == id) 
