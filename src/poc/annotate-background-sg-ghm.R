@@ -48,6 +48,8 @@ files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.na
 evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
          "date" = as.character(as_date(t2_))) %>%
+  filter(abs(x2_) < 180) %>%
+  filter(abs(y2_) < 90) %>%
   st_as_sf(coords = c("x2_","y2_"), crs="+proj=longlat +datum=WGS84", remove = FALSE) %>%
   st_make_valid()
 
@@ -89,15 +91,30 @@ ghm <- raster(paste0(.wd,"/data/gHM/gHM.tif"))
 message("transform event table...")
 evt_ghm <- st_transform(evt,st_crs(ghm))
 
+message("extract ghm...")
 evt_ghm$ghm <- raster::extract(ghm,evt_ghm)
 
+message("join annotations...")
 evt_ghm <- evt_ghm %>%
   st_drop_geometry()  %>%
   select(step_id, ghm)
 
-head(evt_ghm)
-
 evt_sg_ghm <- left_join(evt_sg, evt_ghm, by = "step_id")
 
-message("writing out new event table...")
-fwrite(evt_sg_ghm, paste0(.outPF, "event-annotations/ssf-background-points-annotations/individual-files/job-",n,".csv"))
+head(evt_sg_ghm)
+
+message("export individuals...")
+ids <- unique(evt$individual_id)
+
+for(i in 1:length(ids)){
+  id <- ids[i]
+  message(id)
+  
+  d <- evt_sg_ghm %>%
+    filter(individual_id == id)
+  
+  fwrite(d, paste0(paste0(.outPF, "event-annotations/ssf-background-points-annotations/individual-files/individual-",id,".csv")))
+}
+
+
+message("done!")
