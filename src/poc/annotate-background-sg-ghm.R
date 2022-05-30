@@ -48,7 +48,8 @@ files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.na
 evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
          "date" = as.character(as_date(t2_))) %>%
-  st_as_sf(coords = c("x2_","y2_"), crs="+proj=longlat +datum=WGS84", remove = FALSE)
+  st_as_sf(coords = c("x2_","y2_"), crs="+proj=longlat +datum=WGS84", remove = FALSE) %>%
+  st_make_valid()
 
 
 message("reading in census block group geometries...")
