@@ -35,7 +35,7 @@ files <- list.files(paste0(.wd,'/analysis/ssf-background-pts/individual-files'),
 n_total <- length(files)
 
 
-n <- 200
+n <- 150
 n_events <- floor(n_total/n)
 
 start_ix <- seq(from = 1, to = n*n_events, by = n_events)
