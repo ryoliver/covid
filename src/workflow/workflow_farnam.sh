@@ -113,7 +113,7 @@ module load R/4.1.0-foss-2020b
 Rscript $src/workflow/create_annotation_joblist.R
 
 module load dSQ
-dsq --job-file $src/workflow/annotation-joblist.txt --mem-per-cpu 100g -t 2- 
+dsq --job-file $src/workflow/annotation-joblist.txt --mem-per-cpu 200g -t 2- 
 
 # UPDATE WITH DATE
 #sbatch dsq-joblist-2022-05-27.sh
