@@ -12,5 +12,5 @@ annotation workflow-
 * step 6: annotate events with TNC global human modification layer
 
 SSF workflow-
-* step 1: generate centroids from events (one per day)
-* step 2: generate background points from centroids
+* step 1: generate background points
+* step 2: annotate background points
