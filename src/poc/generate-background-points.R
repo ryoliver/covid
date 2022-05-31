@@ -60,6 +60,7 @@ evt <- dbGetQuery(db,'SELECT event_id,individual_id,lon,lat,timestamp from event
 
 
 ids <- unique(evt$individual_id)
+errors <- 0
   
 for(i in 1:length(ids)){
   id <- ids[i]
@@ -96,6 +97,15 @@ for(i in 1:length(ids)){
         fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
         
         message(paste0(id,": worked"))
+        
+        test <- ssf %>%
+          filter(abs(x2_) > 180) %>%
+          filter(abs(y2_) > 90)
+        
+        if (nrow(test) > 0){
+          message(paste0("errors (n): ", nrow(test)))
+          errors <- errors + 1
+        }
       } else{
         message(paste0(id,": filtered"))
       }
@@ -106,6 +116,8 @@ for(i in 1:length(ids)){
     message(paste0(id,": filtered"))
     }
 }
+
+message(paste0("individuals with errors (n): ", errors))
 
 dbDisconnect(db)
 
