@@ -43,7 +43,7 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
   .outPF <- file.path(.wd,'analysis/event-annotations/')
 
@@ -55,7 +55,7 @@ if(interactive()) {
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
   .outPF <- file.path(.wd,'analysis/event-annotations/')
 }
