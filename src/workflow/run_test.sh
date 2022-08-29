@@ -12,4 +12,5 @@
 module load miniconda
 conda activate move
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/intersect-events-grid.R
+#Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/intersect-events-grid.R
+Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/extract-species-examples.R
