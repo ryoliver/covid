@@ -37,7 +37,7 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt_tb <- dbGetQuery(db, 'SELECT individual_id,event_id from event_clean')
+evt_tb <- dbGetQuery(db, 'SELECT individual_id,event_id,lon,lat from event_clean')
 ind_tb <- dbGetQuery(db, 'SELECT individual_id,taxon_canonical_name from individual')
 
 message("join tables")
