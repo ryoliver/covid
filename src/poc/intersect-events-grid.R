@@ -94,12 +94,14 @@ ind_tb <- dbGetQuery(db, 'SELECT individual_id,taxon_canonical_name from individ
 
 
 # intersect event table with census block group geometries
-message("intersecting events with census block groups...")
+message("intersecting events grid...")
 evt_grid <- st_intersection(evt_sf,grid) 
 
 evt_summary <- evt_grid %>%
   st_drop_geometry() %>%
   left_join(., ind_tb, by = "individual_id") %>%
+  filter(study_id != 351564596) %>%
+  filter(study_id != 1891587670) %>%
   group_by(ID_1440) %>%
   summarize("n_events" = n(),
           "n_individuals" = n_distinct(individual_id),
