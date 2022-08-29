@@ -44,8 +44,7 @@ evt_ghm <- fread(paste0(.datPF,"event_ghm.csv"))
 message("join tables")
 events <- fread(paste0(.datPF,"event_sg.csv")) %>%
   left_join(., evt_ghm, by = "event_id") %>%
-  left_join(., evt_tb, by = "event_id") %>%
-  left_join(., ind_tb, by = "individual_id") 
+  left_join(., evt_tb, by = "event_id") 
 
 message("write out results")
 fwrite(events, paste0(.outPF, "events.csv"))
