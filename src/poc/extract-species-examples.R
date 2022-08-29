@@ -7,7 +7,7 @@ if(interactive()) {
   rd <- here::here
   
   .dbPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/out/event-annotation'
+  .datPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/out/event-annotation/'
   .outPF <- file.path(.wd,'analysis/')
   
 } else {
