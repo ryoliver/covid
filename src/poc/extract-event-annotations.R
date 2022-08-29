@@ -43,10 +43,9 @@ evt_ghm <- fread(paste0(.datPF,"event_ghm.csv"))
 
 message("join tables")
 events <- fread(paste0(.datPF,"event_sg.csv")) %>%
-  left_join(., event_gh, by = "event_id") %>%
+  left_join(., event_ghm, by = "event_id") %>%
   left_join(., evt_tb, by = "event_id") %>%
-  left_join(., ind_tb, by = "individual_id") %>%
-  filter(taxon_canonical_name %in% c("Puma concolor", "Anas cyanoptera", "Anas strepera","Corvus corax"))
+  left_join(., ind_tb, by = "individual_id") 
 
 message("write out results")
 fwrite(events, paste0(.outPF, "events.csv"))
