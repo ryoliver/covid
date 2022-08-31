@@ -28,6 +28,8 @@ suppressWarnings(
     library(data.table)
     library(cowplot)
     library(lubridate)
+    library(reshape2)
+    library(MASS)
   }))
 
 
@@ -41,6 +43,46 @@ d <- d %>%
   select(individual_id, timestamp, year, sg_norm, ghm) %>%
   distinct(individual_id, timestamp, .keep_all = TRUE)
 
+
+d19 <- d %>%
+  filter(year == 2019)
+
+d20 <- d %>%
+  filter(year == 2020)
+
+# Calculate the 2d density estimate over the common range
+xrng <- range(d$ghm)
+yrng <- range(d$sg_norm)
+
+d1 = kde2d(d19$ghm, d19$sg_norm, lims=c(xrng, yrng), n=50)
+d2 = kde2d(d20$ghm, d20$sg_norm, lims=c(xrng, yrng), n=50)
+
+# Confirm that the grid points for each density estimate are identical
+identical(d1$x, d2$x) # TRUE
+identical(d1$y, d2$y)
+
+
+# Calculate the difference between the 2d density estimates
+diff12 = d1 
+diff12$z = d2$z - d1$z
+
+## Melt data into long format
+# First, add row and column names (x and y grid values) to the z-value matrix
+rownames(diff12$z) = diff12$x
+colnames(diff12$z) = diff12$y
+
+# Now melt it to long format
+diff12.m = reshape2::melt(diff12$z, id.var=rownames(diff12))
+names(diff12.m) = c("modification","mobility","z")
+
+# Plot difference between geyser2 and geyser1 density
+ggplot(diff12.m, aes(modification, mobility, z=z, fill=z)) +
+  geom_tile() +
+  #stat_contour(aes(colour=..level..), binwidth=0.001) +
+  scale_fill_gradient2(low="red",mid="white", high="blue", midpoint=0) +
+  scale_colour_gradient2(low=muted("red"), mid="white", high=muted("blue"), midpoint=0) +
+  coord_cartesian(xlim=xrng, ylim=yrng) +
+  guides(colour="none")
 
 
 
@@ -78,6 +120,7 @@ p2 <- ggplot(data = subset(d, year == 2020),
                      limits = c(NA, 0.004),
                      labels = comma) +
   labs(x = "modification", y = "mobility")
+
 
 i <- 1/2
 pdf("~/Desktop/test.pdf", width = 12, height = 5)
