@@ -137,12 +137,12 @@ p2 <- ggplot(data = ind,
 
 
 
-pdf(paste0(.wd,"analysis/figures/fig1-individual-map.pdf"), width = 8, height = 4)
+pdf(paste0(.wd,"/analysis/figures/fig1-individual-map.pdf"), width = 8, height = 4)
 ggdraw() +
   draw_plot(p1)
 dev.off()
 
-pdf(paste0(.wd,"analysis/figures/fig1-individual-map.pdf"), width = 4, height = 2.5)
+pdf(paste0(.wd,"/analysis/figures/fig1-individual-timeseries.pdf"), width = 4, height = 2.5)
 ggdraw() +
   draw_plot(p2)
 dev.off()
