@@ -79,7 +79,7 @@ ind <- species %>%
 ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 ind <- st_transform(ind, crs(ghm))
-ind_buffer <- st_buffer(ind, 1000)
+ind_buffer <- st_buffer(ind, 5000)
 
 r <- terra::crop(ghm, ind_buffer)
 r <- rasterToPolygons(r)
@@ -122,18 +122,47 @@ p2 <- ggplot(data = ind,
        aes(y = sg_norm, x = doy, 
            color = as.factor(year), group = as.factor(year))) +
   scale_color_manual(values = c(color19,color20)) +
+  scale_fill_manual(values = c(color19,color20)) +
   
   geom_point(lwd = 1) +
-  theme_cowplot() +
+  geom_smooth(stat= "smooth", aes(fill = as.factor(year)), 
+              show.legend = FALSE) +
+  theme_cowplot()  +
+  guides(color = guide_legend(override.aes = list(size= 5))) +
+  
   theme(legend.position= c(0.8,0.9),
         legend.title = element_blank(),
-        legend.text = element_text(size = 9),
-        axis.title = element_text(size = 9),
-        axis.text = element_text(size = 8)) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+        legend.text = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 9)) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01)),
+                     breaks = seq(0,165, by = 2),
+                     labels = every_nth(seq(0,165,by = 2),10, inverse = TRUE)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.01)),
                      trans = "log10") +
   labs(x  = "Day of year", y = "Mobility") 
+
+p3 <- ggplot(data = ind, 
+       aes(x = sg_norm, 
+           color = as.factor(year), fill = as.factor(year),
+           group = as.factor(year))) +
+  scale_color_manual(values = c(color19,color20)) +
+  scale_fill_manual(values = c(color19,color20)) +
+  
+  geom_density(alpha = 0.5) +
+  
+  theme_cowplot()  +
+
+  theme(legend.position= "none",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 9)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01)),
+                     trans = "log10") +
+  labs(y  = "Density", x = "Mobility") +
+  coord_flip()
 
 
 
@@ -142,7 +171,12 @@ ggdraw() +
   draw_plot(p1)
 dev.off()
 
-pdf(paste0(.wd,"/analysis/figures/fig1-individual-timeseries.pdf"), width = 4, height = 2.5)
+pdf(paste0(.wd,"/analysis/figures/fig1-individual-timeseries.pdf"), width = 4.5, height = 3)
 ggdraw() +
   draw_plot(p2)
+dev.off()
+
+pdf(paste0(.wd,"/analysis/figures/fig1-individual-density.pdf"), width = 2, height = 3)
+ggdraw() +
+  draw_plot(p3)
 dev.off()
