@@ -125,8 +125,8 @@ p2 <- ggplot(data = ind,
   scale_fill_manual(values = c(color19,color20)) +
   
   geom_point(lwd = 1) +
-  geom_smooth(stat= "smooth", aes(fill = as.factor(year)), 
-              show.legend = FALSE) +
+  #geom_smooth(stat= "smooth", aes(fill = as.factor(year)), 
+  #            show.legend = FALSE) +
   theme_cowplot()  +
   guides(color = guide_legend(override.aes = list(size= 5))) +
   
