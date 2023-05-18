@@ -48,7 +48,7 @@ d <- fread(paste0(.outPF,"fig1-example-species.csv"))
 d <- d %>%
   mutate(year = lubridate::year(timestamp),
          sg_norm = safegraph_daily_count/cbg_area_m2) %>%
-  select(taxon_canonical_name, individual_id, timestamp, lon, lat, year, sg_norm) 
+  dplyr::select(taxon_canonical_name, individual_id, timestamp, lon, lat, year, sg_norm) 
 
 d_summary <- d %>%
   group_by(individual_id) %>%
@@ -79,12 +79,13 @@ ind <- species %>%
 ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 ind <- st_transform(ind, crs(ghm))
-ind_buffer <- st_buffer(ind, 5000)
+ind_buffer <- st_buffer(ind, 6000)
 
 r <- terra::crop(ghm, ind_buffer)
 r <- rasterToPolygons(r)
 r <- st_as_sf(r)
 r <- st_transform(r, crs = 4326)
+ind <- st_transform(ind, crs = 4326)
 
 bbox <- unname(st_bbox(r))
 l <- bbox[1]
@@ -101,82 +102,97 @@ basemap <- get_stamenmap(bbox = c(left = l - abs(l)*0.001, bottom = b -abs(b)*0.
 
 p1 <- ggmap(basemap) +
   geom_sf(data = r, aes (fill = gHM), 
-          color = "transparent", alpha = 0.5, 
+          color = "transparent", alpha = 0.8, 
           inherit.aes = FALSE) +
   geom_sf(data = ind, aes(color = as.factor(year)), 
           alpha = 0.5,
+          size = 0.5,
           inherit.aes = FALSE) +
-  scale_fill_gradient(low = "#FEF7EB",
-                      high = "#E9980C",
-                      name = "Modification") +
+  scale_fill_gradientn(colours = c("#FFFFFF","#D58B0B")) +
   scale_color_manual(values = c(color19,color20),
                      guide = "none") +
   coord_sf(datum = NA) +
   theme(axis.title = element_blank(),
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         panel.background = element_blank(), axis.line = element_blank(),
-        plot.background = element_rect(fill = "transparent",colour = NA))
+        plot.background = element_rect(fill = "transparent",colour = NA)) +
+  guides(fill = guide_colorbar(title.position = "top")) +
+  theme(legend.position = "right", 
+        legend.title=element_text(size=9),
+        legend.text=element_text(size=8)) +
+  labs(fill = "Modification")
 
+test <- st_intersection(ind, r)
 
-p2 <- ggplot(data = ind, 
-       aes(y = sg_norm, x = doy, 
-           color = as.factor(year), group = as.factor(year))) +
-  scale_color_manual(values = c(color19,color20)) +
-  scale_fill_manual(values = c(color19,color20)) +
-  
-  geom_point(lwd = 1) +
-  #geom_smooth(stat= "smooth", aes(fill = as.factor(year)), 
-  #            show.legend = FALSE) +
-  theme_cowplot()  +
-  guides(color = guide_legend(override.aes = list(size= 5))) +
-  
-  theme(legend.position= c(0.8,0.9),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 10),
-        axis.title = element_text(size = 10),
-        axis.text = element_text(size = 9)) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01)),
-                     breaks = seq(0,165, by = 2),
-                     labels = every_nth(seq(0,165,by = 2),10, inverse = TRUE)) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.01)),
-                     trans = "log10") +
-  labs(x  = "Day of year", y = "Mobility") 
-
-p3 <- ggplot(data = ind, 
-       aes(x = sg_norm, 
-           color = as.factor(year), fill = as.factor(year),
-           group = as.factor(year))) +
+p2 <- ggplot(data = test, 
+             aes(x = gHM, 
+                 color = as.factor(year), fill = as.factor(year),
+                 group = as.factor(year))) +
   scale_color_manual(values = c(color19,color20)) +
   scale_fill_manual(values = c(color19,color20)) +
   
   geom_density(alpha = 0.5) +
+  theme_minimal_hgrid()  +
   
-  theme_cowplot()  +
-
   theme(legend.position= "none",
-        legend.title = element_blank(),
-        legend.text = element_text(size = 10),
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        axis.title.y = element_blank()) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.01))) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01))) +
+  labs(y  = "Density") +
+  coord_flip()
+
+p3 <- ggplot(data = ind, 
+             aes(y = sg_norm, x = doy, 
+                 color = as.factor(year), group = as.factor(year)),
+             alpha = 0.5) +
+  scale_color_manual(values = c(color19,color20)) +
+  scale_fill_manual(values = c(color19,color20)) +
+  
+  geom_point(lwd = 1) +
+  theme_minimal_grid()  +
+  
+  theme(legend.position = "none",
         axis.title = element_text(size = 10),
-        axis.text = element_text(size = 9)) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.01))) +
+        axis.text = element_text(size = 8)) +
+  scale_x_continuous(expand = expansion(mult = c(0.01, 0.01)),
+                     breaks = c(1,32,60,91,121,152),
+                     labels = c("January", "February", "March",
+                                "April", "May", "June")) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.01)),
+                     trans = "log10") +
+  labs(x = " ", y = "Mobility")
+
+
+p4 <- ggplot(data = ind, 
+             aes(x = sg_norm, 
+                 color = as.factor(year), fill = as.factor(year),
+                 group = as.factor(year))) +
+  scale_color_manual(values = c(color19,color20)) +
+  scale_fill_manual(values = c(color19,color20)) +
+  
+  geom_density(alpha = 0.5) +
+  theme_minimal_hgrid()  +
+  
+  theme(legend.position= "none",
+        axis.title = element_text(size = 9),
+        axis.text = element_text(size = 8),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank()) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.01))) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01)),
                      trans = "log10") +
   labs(y  = "Density", x = "Mobility") +
   coord_flip()
 
-
-
-pdf(paste0(.wd,"/analysis/figures/fig1-individual-map.pdf"), width = 8, height = 4)
+pdf(paste0(.wd,"/analysis/figures/fig1-individual-example.pdf"), width = 4.5, height = 4)
 ggdraw() +
-  draw_plot(p1)
+  draw_plot(p1, x = 0, y = 0.5, height = 0.5, width = 0.77) +
+  draw_plot(p2, x = 0.73, y = 0.5, height = 0.5, width = 0.27) +
+  draw_plot(p3, x = 0, y = 0, height = 0.5, width = 0.77) +
+  draw_plot(p4, x = 0.77, y = 0, height = 0.5, width = 0.22)
 dev.off()
 
-pdf(paste0(.wd,"/analysis/figures/fig1-individual-timeseries.pdf"), width = 4.5, height = 3)
-ggdraw() +
-  draw_plot(p2)
-dev.off()
 
-pdf(paste0(.wd,"/analysis/figures/fig1-individual-density.pdf"), width = 2, height = 3)
-ggdraw() +
-  draw_plot(p3)
-dev.off()
+
