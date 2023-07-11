@@ -19,6 +19,7 @@ niche_icon <- "~/Desktop/covid-results/images/niche-size.png"
 mammal_icon <-  "~/Desktop/covid-results/images/carnivore.png"
 bird_icon <- "~/Desktop/covid-results/images/corvid.png"
 
+fig2schematic <- "~/Desktop/covid-results/images/fig2-schematic.png"
 
 species_names <- data.frame("scientific_name" = c("Alces alces",
                                                   "Antilocapra americana",
@@ -176,8 +177,12 @@ p1 <- ggplot(space_use_mobility) +
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "none",
+        legend.title = element_text(size = 9,
+                                    face = "bold"),
+        legend.text = element_text(size = 8),
         plot.title = element_text(face = "bold"),
-        axis.text.y = element_text(size = 8),
+        axis.text.y = element_text(size = 8,
+                                   face = "bold"),
         axis.title = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_line(color = "#4a4e4d"),
@@ -217,8 +222,12 @@ p3 <- ggplot(space_use_modification) +
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "none",
+        legend.title = element_text(size = 9,
+                                    face = "bold"),
+        legend.text = element_text(size = 8),
         plot.title = element_text(face = "bold"),
-        axis.text.y = element_text(size = 8),
+        axis.text.y = element_text(size = 8,
+                                   face = "bold"),
         axis.title.y = element_blank(),
         axis.title.x = element_text(size = 10, 
                                     face = "bold"),
@@ -263,6 +272,9 @@ p2 <- ggplot(niche_mobility) +
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "none",
+        legend.title = element_text(size = 9,
+                                    face = "bold"),
+        legend.text = element_text(size = 8),
         plot.title = element_text(face = "bold"),
         axis.text.y = element_blank(),
         axis.title = element_blank(),
@@ -316,6 +328,9 @@ p4 <- ggplot(niche_modification) +
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "none",
+        legend.title = element_text(size = 9,
+                                    face = "bold"),
+        legend.text = element_text(size = 8),
         plot.title = element_text(face = "bold"),
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
@@ -368,7 +383,8 @@ puma1 <- ggplot(puma_space_use_mobility) +
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "none",
-        axis.text.y = element_text(size = 8),
+        axis.text.y = element_text(size = 8,
+                                   face = "bold"),
         axis.title = element_blank(),
         axis.title.x = element_blank(),
         axis.text.x = element_text(size = 7.5),
@@ -406,11 +422,18 @@ puma2 <- ggplot(puma_niche_mobility) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "#4a4e4d") 
 
 
-p <- (p1 + p2)/(puma1 + puma2)/(p3 + p4) +
-  plot_layout(heights = c(9,1,9)) 
+p <- plot_spacer()/(p1 + p2)/(puma1 + puma2)/(p3 + p4) +
+  plot_layout(heights = c(9,9,1,9)) 
+
+p <- ggdraw() +
+  draw_plot(p, width = 1)+
+  draw_image(image_read(fig2schematic), x = 0.02, y = 0.64, height = 0.5, width = 0.94) +
+  
+  draw_image(image_read(area_icon), x = 0.28, y = 0.69, height = 0.12, width = 0.12) +
+  draw_image(image_read(niche_icon), x = 0.71, y = 0.69, height = 0.12, width = 0.12) 
 
 
-ggsave(p, file = "~/Desktop/figure2.png", width = 8, height = 6.8)
+ggsave(p, file = "~/Desktop/test.png", width = 8, height = 8.5)
 
 
 
