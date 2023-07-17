@@ -239,6 +239,7 @@ p1 <- ggplot(space_use_mobility) +
                                 "interaction, high estimate",
                                 "additive",
                                 "not significant")) +
+  scale_y_discrete(labels=c("Mean response"=expression(bold("Mean response")), parse=TRUE)) +
   xlab(x_label) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
@@ -258,7 +259,7 @@ p1 <- ggplot(space_use_mobility) +
         panel.spacing.x = unit(2, "lines"),
         panel.spacing.y = unit(1, "lines")) +
   ggtitle("Effect of human mobility") +
-  labs(tag = "a")
+  labs(tag = bquote(bold("a")))
 
 p3 <- ggplot(space_use_modification) +
   geom_segment(
@@ -279,6 +280,7 @@ p3 <- ggplot(space_use_modification) +
                                 "interaction, high estimate",
                                 "additive",
                                 "not significant")) +
+  scale_y_discrete(labels=c("Mean response"=expression(bold("Mean response")), parse=TRUE)) +
   xlab(x_label) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
@@ -299,7 +301,7 @@ p3 <- ggplot(space_use_modification) +
         panel.spacing.x = unit(2, "lines"),
         panel.spacing.y = unit(1, "lines")) +
   ggtitle("Effect of human modification") +
-  labs(tag = "c")
+  labs(tag = bquote(bold("c")))
 
 n <- rbind(niche_mobility, niche_modification)
 min_val <- min(n$LCL)
@@ -353,7 +355,7 @@ p2 <- ggplot(niche_mobility) +
         strip.background = element_rect(fill = "#DDE0E4",
                                         color = "transparent")) +
   ggtitle(" ") +
-  labs(tag = "b")
+  labs(tag = bquote(bold("b")))
 
 
 p4 <- ggplot(niche_modification) +
@@ -401,7 +403,7 @@ p4 <- ggplot(niche_modification) +
         strip.background = element_rect(fill = "#DDE0E4",
                                         color = "transparent"))  +
   ggtitle(" ") +
-  labs(tag = "d")
+  labs(tag = bquote(bold("d")))
 
 puma_space_use_mobility <- space_use %>%
   filter(species == "Puma concolor") %>%
