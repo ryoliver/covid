@@ -480,4 +480,7 @@ p <- (p1 + p2)/(puma1 + puma2)/(p3 + p4) +
 ggsave(p, file = "~/Desktop/figure2.png", width = 8, height = 7)
 
 
-
+meta_area_ghm <- fread("~/Desktop/covid-results/area_meta_ghm.csv") 
+meta_area_sg <- fread("~/Desktop/covid-results/area_meta_sg.csv") 
+meta_niche_ghm <- fread("~/Desktop/covid-results/niche_meta_ghm.csv") 
+meta_niche_sg <- fread("~/Desktop/covid-results/niche_meta_sg.csv") 
