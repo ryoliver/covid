@@ -55,22 +55,22 @@ species_names <- data.frame("scientific_name" = c("Alces alces",
                                               "Common raven",
                                               "Bald eagle")) %>%
   mutate(taxa = case_when(scientific_name %in% c("Anser caerulescens",
-                                         "Ardea alba",
-                                         "Aquila chrysaetos",
-                                         "Corvus corax",
-                                         "Haliaeetus leucocephalus") ~ "birds",
+                                                 "Ardea alba",
+                                                 "Aquila chrysaetos",
+                                                 "Corvus corax",
+                                                 "Haliaeetus leucocephalus") ~ "birds",
                           scientific_name %in% c("Alces alces",
-                                         "Antilocapra americana",
-                                         "Cervus elaphus",
-                                         "Odocoileus hemionus",
-                                         "Odocoileus virginianus",
-                                         "Ovis canadensis",
-                                         "Canis latrans",
-                                         "Canis lupus",
-                                         "Lynx rufus",
-                                         "Puma concolor",
-                                         "Ursus americanus",
-                                         "Ursus arctos") ~ "mammals")) 
+                                                 "Antilocapra americana",
+                                                 "Cervus elaphus",
+                                                 "Odocoileus hemionus",
+                                                 "Odocoileus virginianus",
+                                                 "Ovis canadensis",
+                                                 "Canis latrans",
+                                                 "Canis lupus",
+                                                 "Lynx rufus",
+                                                 "Puma concolor",
+                                                 "Ursus americanus",
+                                                 "Ursus arctos") ~ "mammals")) 
 
 ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-05-02.csv") %>%
   mutate("driver" = rep("Human modification", nrow(.))) %>%
@@ -84,6 +84,38 @@ space_use <- rbind(ghm, sg)
 space_use <- space_use %>%
   left_join(.,species_names, by = c("species" = "scientific_name")) %>%
   filter(!species %in% c("Anser caerulescens")) 
+
+area_meta_ghm <- fread("~/Desktop/covid-results/area_meta_ghm.csv") %>%
+  filter(Parameter != "sigma") %>%
+  mutate(species = rep(NA, nrow(.)),
+         common_name = rep("Mean response", nrow(.)),
+         taxa = rep(NA, nrow(.)),
+         sig_code = rep(NA, nrow(.)),
+         Estimate = Median,
+         LCL = CI_low,
+         HCL = CI_high,
+         driver = "Human modification") %>%
+  mutate(taxa = case_when(Parameter == "b_classbird" ~ "birds",
+                          Parameter == "b_classmammal" ~ "mammals")) %>%
+  mutate(species = taxa) %>%
+  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, driver)
+
+area_meta_sg <- fread("~/Desktop/covid-results/area_meta_sg.csv") %>%
+  filter(Parameter != "sigma") %>%
+  mutate(species = rep(NA, nrow(.)),
+         common_name = rep("Mean response", nrow(.)),
+         taxa = rep(NA, nrow(.)),
+         sig_code = rep(NA, nrow(.)),
+         Estimate = Median,
+         LCL = CI_low,
+         HCL = CI_high,
+         driver = "Human mobility") %>%
+  mutate(taxa = case_when(Parameter == "b_classbird" ~ "birds",
+                          Parameter == "b_classmammal" ~ "mammals")) %>%
+  mutate(species = taxa) %>%
+  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, driver)
+
+space_use <- rbind(space_use, area_meta_ghm, area_meta_sg)
 
 space_use$sig_code <- factor(space_use$sig_code, levels = c("low_int","high_int","sig_add", "ns_add"))
 space_use$taxa <- factor(space_use$taxa, levels = c("mammals","birds"))
@@ -103,6 +135,38 @@ niche <- niche %>%
   left_join(.,species_names, by = c("species" = "scientific_name")) %>%
   filter(!species %in% c("Numenius americanus","Anser caerulescens","Sus scrofa","Grus canadensis"))
 
+niche_meta_ghm <- fread("~/Desktop/covid-results/niche_meta_ghm.csv") %>%
+  filter(Parameter != "sigma") %>%
+  mutate(species = rep(NA, nrow(.)),
+         common_name = rep("Mean response", nrow(.)),
+         taxa = rep(NA, nrow(.)),
+         sig_code = rep(NA, nrow(.)),
+         Estimate = Median,
+         LCL = CI_low,
+         HCL = CI_high,
+         driver = "Human modification") %>%
+  mutate(taxa = case_when(Parameter == "b_classbird" ~ "birds",
+                          Parameter == "b_classmammal" ~ "mammals")) %>%
+  mutate(species = taxa) %>%
+  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, driver)
+
+niche_meta_sg <- fread("~/Desktop/covid-results/niche_meta_sg.csv") %>%
+  filter(Parameter != "sigma") %>%
+  mutate(species = rep(NA, nrow(.)),
+         common_name = rep("Mean response", nrow(.)),
+         taxa = rep(NA, nrow(.)),
+         sig_code = rep(NA, nrow(.)),
+         Estimate = Median,
+         LCL = CI_low,
+         HCL = CI_high,
+         driver = "Human mobility") %>%
+  mutate(taxa = case_when(Parameter == "b_classbird" ~ "birds",
+                          Parameter == "b_classmammal" ~ "mammals")) %>%
+  mutate(species = taxa) %>%
+  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, driver)
+
+niche <- rbind(niche, niche_meta_ghm, niche_meta_sg)
+
 niche$sig_code <- factor(niche$sig_code, levels = c("low_int","high_int","sig_add", "ns_add"))
 niche$taxa <- factor(niche$taxa, levels = c("mammals","birds"))
 niche$driver <- factor(niche$driver, levels = c("Human modification","Human mobility"))
@@ -114,18 +178,23 @@ mobility_order <- space_use %>%
   group_by(taxa) %>%
   arrange(Estimate, .by_group = TRUE) %>%
   distinct(species) %>%
-  mutate("order" = seq(1:n())) %>%
+  mutate("order" = seq(1:n())+1) %>%
   ungroup() %>%
   select(species, order)
+
+mobility_order[mobility_order$species %in% c("birds","mammals"),]$order <- 1
 
 modification_order <- space_use %>%
   filter(driver == "Human modification") %>%
   group_by(taxa) %>%
   arrange(Estimate, .by_group = TRUE) %>%
   distinct(species) %>%
-  mutate("order" = seq(1:n())) %>%
+  mutate("order" = seq(1:n())+1) %>%
   ungroup() %>%
   select(species, order)
+
+modification_order[modification_order$species %in% c("birds","mammals"),]$order <- 1
+
 
 space_use_mobility <- space_use %>%
   filter(driver == "Human mobility") %>%
@@ -189,8 +258,7 @@ p1 <- ggplot(space_use_mobility) +
         panel.spacing.x = unit(2, "lines"),
         panel.spacing.y = unit(1, "lines")) +
   ggtitle("Effect of human mobility") +
-  labs(tag = expression(bold("a")))
-
+  labs(tag = "a")
 
 p3 <- ggplot(space_use_modification) +
   geom_segment(
@@ -231,7 +299,7 @@ p3 <- ggplot(space_use_modification) +
         panel.spacing.x = unit(2, "lines"),
         panel.spacing.y = unit(1, "lines")) +
   ggtitle("Effect of human modification") +
-  labs(tag = expression(bold("c")))
+  labs(tag = "c")
 
 n <- rbind(niche_mobility, niche_modification)
 min_val <- min(n$LCL)
@@ -285,10 +353,7 @@ p2 <- ggplot(niche_mobility) +
         strip.background = element_rect(fill = "#DDE0E4",
                                         color = "transparent")) +
   ggtitle(" ") +
-  labs(tag = expression(bold("b")))
-
-
-
+  labs(tag = "b")
 
 
 p4 <- ggplot(niche_modification) +
@@ -336,7 +401,7 @@ p4 <- ggplot(niche_modification) +
         strip.background = element_rect(fill = "#DDE0E4",
                                         color = "transparent"))  +
   ggtitle(" ") +
-  labs(tag = expression(bold("d")))
+  labs(tag = "d")
 
 puma_space_use_mobility <- space_use %>%
   filter(species == "Puma concolor") %>%
@@ -410,7 +475,7 @@ p <- (p1 + p2)/(puma1 + puma2)/(p3 + p4) +
   plot_layout(heights = c(9,1,9)) 
 
 
-ggsave(p, file = "~/Desktop/figure2.png", width = 8, height = 6.8)
+ggsave(p, file = "~/Desktop/figure2.png", width = 8, height = 7)
 
 
 
