@@ -12,6 +12,7 @@ library(ggbeeswarm)
 
 rm(list = ls())
 
+#5D5D81
 
 pred_dat <- read_csv("~/Desktop/covid-results/area_change_prediction_2023-06-23.csv")
 
@@ -139,12 +140,16 @@ niche_mean_diff <- niche_diff_df %>%
   pull(mdiff) %>% 
   round(1)
 
+max_val <- max(c(min(area_diff_df$diff_km, na.rm = TRUE), max(area_diff_df$diff_km, na.rm = TRUE)))
+
+
 p1 <- ggplot(area_diff_df, aes(x = -diff_km, y = group, color = taxa)) +
   geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
+  geom_vline(aes(xintercept = -area_mean_diff), linetype = "dotted", color = "#4a4e4d") +
   geom_beeswarm(cex = 8, alpha = 0.7, size = 3) +
   geom_point(aes(x = -area_mean_diff), size = 3, shape = 22, 
-             fill = "#CED3B1", color = "#B5BD89") +
-  scale_color_manual(values = c("#DD9787","#6F8AB7")) +
+             fill = "#ABB0AE", color = "#4A4E4D") +
+  scale_color_manual(values = c("#FFD275","#360568")) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
@@ -156,15 +161,18 @@ p1 <- ggplot(area_diff_df, aes(x = -diff_km, y = group, color = taxa)) +
         axis.title.x = element_text(size = 9, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
+  coord_cartesian(xlim = c(-max_val,max_val)) +
   labs(x = bquote(bold('Change in area size'~(km^2))), tag = "a")
 
+max_val <- max(c(min(niche_diff_df$percent_change, na.rm = TRUE), max(niche_diff_df$percent_change, na.rm = TRUE)))
 
 p2 <- ggplot(niche_diff_df, aes(x = percent_change, y = group, color = taxa)) +
   geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
+  geom_vline(aes(xintercept = niche_mean_diff), linetype = "dotted", color = "#4a4e4d") +
   geom_beeswarm(cex = 8, alpha = 0.7, size = 3) +
   geom_point(aes(x = niche_mean_diff), size = 3, shape = 22, 
-             fill = "#CED3B1", color = "#B5BD89") +
-  scale_color_manual(values = c("#DD9787","#6F8AB7")) +
+             fill = "#ABB0AE", color = "#4A4E4D") +
+  scale_color_manual(values = c("#FFD275","#360568")) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
@@ -175,6 +183,7 @@ p2 <- ggplot(niche_diff_df, aes(x = percent_change, y = group, color = taxa)) +
         axis.title.x = element_text(size = 9, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
+  coord_cartesian(xlim = c(-max_val,max_val)) +
   labs(x = bquote('Change in niche size (%)'), tag = "b")
 
 p <- p1/p2
