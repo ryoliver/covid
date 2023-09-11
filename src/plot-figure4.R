@@ -146,46 +146,50 @@ max_val <- max(c(min(area_diff_df$diff_km, na.rm = TRUE), max(area_diff_df$diff_
 p1 <- ggplot(area_diff_df, aes(x = -diff_km, y = group, color = taxa)) +
   geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
   geom_vline(aes(xintercept = -area_mean_diff), linetype = "dotted", color = "#4a4e4d") +
-  geom_beeswarm(cex = 8, alpha = 0.7, size = 3) +
+  geom_beeswarm(cex = 8, alpha = 0.7, size = 2) +
   geom_point(aes(x = -area_mean_diff), size = 3, shape = 22, 
              fill = "#ABB0AE", color = "#4A4E4D") +
-  scale_color_manual(values = c("#FFD275","#360568")) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
-        legend.position = "top",
+        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
+        legend.position = "none",
         legend.title = element_blank(),
         axis.text.y = element_blank(),
         axis.title = element_blank(),
-        axis.title.x = element_text(size = 9, 
+        axis.text = element_text(size = 6),
+        axis.title.x = element_text(size = 6, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote(bold('Change in area size'~(km^2))), tag = "a")
+  labs(x = bquote(bold('Change in area size'~(km^2))))
 
 max_val <- max(c(min(niche_diff_df$percent_change, na.rm = TRUE), max(niche_diff_df$percent_change, na.rm = TRUE)))
 
 p2 <- ggplot(niche_diff_df, aes(x = percent_change, y = group, color = taxa)) +
   geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
   geom_vline(aes(xintercept = niche_mean_diff), linetype = "dotted", color = "#4a4e4d") +
-  geom_beeswarm(cex = 8, alpha = 0.7, size = 3) +
+  geom_beeswarm(cex = 8, alpha = 0.7, size = 2) +
   geom_point(aes(x = niche_mean_diff), size = 3, shape = 22, 
              fill = "#ABB0AE", color = "#4A4E4D") +
-  scale_color_manual(values = c("#FFD275","#360568")) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
+        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
         legend.position = "none",
         axis.text.y = element_blank(),
         axis.title = element_blank(),
-        axis.title.x = element_text(size = 9, 
+        axis.text = element_text(size = 6),
+        axis.title.x = element_text(size = 6, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in niche size (%)'), tag = "b")
+  labs(x = bquote('Change in niche size (%)'))
 
 p <- p1/p2
 
-ggsave(p, file = "~/Desktop/figure4.png", width = 5, height = 4)
+ggsave(p, file = "~/Desktop/figure4.png", width = 3.5, height = 2)
