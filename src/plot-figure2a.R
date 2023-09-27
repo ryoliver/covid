@@ -205,10 +205,6 @@ p <- ggplot(results) +
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))+
   scale_y_discrete(labels=c("Mean response"=expression(bold("Mean response")), parse=TRUE)) 
-  
-
-ggsave(p, file = "~/Desktop/test.pdf", width = 180, height = 100, units = "mm")
-
 
 
 p_cougar <- ggplot(cougar) +
@@ -248,4 +244,4 @@ p_cougar <- ggplot(cougar) +
 p_combined <- p_cougar / p +
   plot_layout(heights = c(1,20))
 
-ggsave(p_combined, file = "~/Desktop/test.pdf", width = 180, height = 100, units = "mm")
+ggsave(p_combined, file = "~/Desktop/fig2a.pdf", width = 180, height = 100, units = "mm")
