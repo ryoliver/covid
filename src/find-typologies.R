@@ -35,6 +35,7 @@ niche <- left_join(niche_ghm, niche_sg, by = "species") %>%
   mutate(niche_sig = ifelse(niche_sig > 0, 1, 0)) %>%
   select(-ghm_sig, -sg_sig)
 
+## NOTE: common names are hardcoded 
 species_name <- data.frame(scientific_name = sort(intersect(area_ghm$species, niche_ghm$species)),
                            common_name = c("Moose",
                                            "Northern pintail",
