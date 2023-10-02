@@ -7,6 +7,7 @@ library(ggtext)
 library(extrafont)
 library(ggimage)
 library(magick)
+library(ggh4x)
 
 rm(list = ls())
 
@@ -87,9 +88,9 @@ species_name <- data.frame(scientific_name = sort(intersect(area_ghm$species, ni
                                                  "Odocoileus hemionus",
                                                  "Odocoileus virginianus",
                                                  "Ovis canadensis",
-                                                 "Puma concolor",
                                                  "Ursus americanus",
-                                                 "Ursus arctos") ~ "mammals")) 
+                                                 "Ursus arctos") ~ "mammals",
+                          scientific_name %in% c("Puma concolor") ~ "cougar")) 
   
 
 results <- rbind(area_ghm, area_sg, niche_ghm, niche_sg) %>%
@@ -110,20 +111,13 @@ results <- left_join(results, mobility_order, by = "species")
 results$response <- factor(results$response,
                            levels = c("area_sg", "area_ghm", "niche_sg", "niche_ghm"))
 results$taxa <- factor(results$taxa,
-                       levels = c("classbird","birds"))
-
-cougar <- results %>%
-  filter(common_name == "Cougar")
-
-results <- results %>%
-  filter(common_name != "Cougar")
-
+                       levels = c("cougar","mammals","birds"))
 
 
 x_label <- "Effect size"
 
-ggplot(results) +
-  facet_grid(rows = vars(taxa), cols = vars(response), scales = "free_y", space = "free") +
+p <- ggplot(results) +
+  ggh4x::facet_grid2(taxa~response, scales = "free", independent = "x", space = "free") +
   geom_segment(
     aes(x = LCL, y = reorder(common_name, -order), 
         xend = HCL,yend = reorder(common_name, -order),
@@ -137,63 +131,24 @@ ggplot(results) +
                  group = sig_code), 
              size = 2) +
   scale_color_manual(name ="model structure",
-                     values = c("#F98177","#8895BF","#6BB0B3","#aeb6bf"),
-                     labels = c("interaction, low estimate",
-                                "interaction, high estimate",
-                                "additive",
-                                "not significant")) +
+                     values = c("#F98177","#8895BF","#aeb6bf","#6BB0B3")) +
   xlab(x_label) +
   theme_minimal() +
   theme(panel.border = element_rect(colour = "#4a4e4d", fill=NA, size=1),
         legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        
         plot.title = element_text(face = "bold"),
         axis.text = element_text(size = 7),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 7, 
+        axis.title.x = element_text(size = 8, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "#4a4e4d") +
+  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme(strip.text = element_blank(),
         panel.spacing.x = unit(0.5, "lines"),
-        panel.spacing.y = unit(0.2, "lines"))+
-  scale_y_discrete(labels=c("Mean response"=expression(bold("Mean response")), parse=TRUE)) 
+        panel.spacing.y = unit(0.2, "lines"))
 
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 180, height = 100, units = "mm")
 
-p_cougar <- ggplot(cougar) +
-  facet_grid(~ response, scales = "free_x") +
-  geom_segment(
-    aes(x = LCL, y = common_name, 
-        xend = HCL,yend = common_name, 
-        group = sig_code,
-        color = sig_code),
-    size = 2.5,
-    alpha = 0.3,
-    lineend = "round") +
-  geom_point(aes(x = Estimate, y = common_name,
-                 color = sig_code,
-                 group = sig_code), 
-             size = 2) +
-  scale_color_manual(name ="model structure",
-                     values = c("#F98177","#8895BF","#6BB0B3","#aeb6bf"),
-                     labels = c("interaction, low estimate",
-                                "interaction, high estimate",
-                                "additive",
-                                "not significant")) +
-  theme_minimal() +
-  theme(panel.border = element_rect(colour = "#4a4e4d", fill=NA, size=1),
-        legend.position = "none",
-        plot.title = element_text(face = "bold"),
-        axis.text = element_text(size = 7),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_line(color = "#4a4e4d")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "#4a4e4d") +
-  theme(strip.text = element_blank(),
-        panel.spacing.x = unit(0.5, "lines"),
-        panel.spacing.y = unit(0.5, "lines"))
-
-
-p_combined <- p_cougar / p +
-  plot_layout(heights = c(1,20))
-
-ggsave(p_combined, file = "~/Desktop/fig2a.pdf", width = 180, height = 100, units = "mm")
