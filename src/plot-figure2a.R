@@ -35,7 +35,7 @@ niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-09-27.csv") %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
 
-
+## NOTE: common names are hardcoded 
 species_name <- data.frame(scientific_name = sort(intersect(area_ghm$species, niche_ghm$species)),
                            common_name = c("Moose",
                                            "Northern pintail",
@@ -150,5 +150,5 @@ p <- ggplot(results) +
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))
 
-ggsave(p, file = "~/Desktop/fig2a.pdf", width = 180, height = 100, units = "mm")
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 170, height = 90, units = "mm")
 
