@@ -33,54 +33,7 @@ niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-09-27.csv") %>%
   mutate(response = rep("niche_sg", nrow(.))) %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
-# meta results
-area_meta_sg <- fread("~/Desktop/covid-results/area_meta_sg.csv") %>%
-  mutate(species = rep(NA, nrow(.)),
-         common_name = rep("Mean response", nrow(.)),
-         taxa = Parameter,
-         sig_code = rep(NA, nrow(.)),
-         LCL = Q2.5,
-         HCL = Q97.5,
-         response = "area_sg",
-         order = 1) %>%
-  mutate(species = taxa) %>%
-  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, response, order)
 
-area_meta_ghm <- fread("~/Desktop/covid-results/area_meta_ghm.csv") %>%
-  mutate(species = rep(NA, nrow(.)),
-         common_name = rep("Mean response", nrow(.)),
-         taxa = Parameter,
-         sig_code = rep(NA, nrow(.)),
-         LCL = Q2.5,
-         HCL = Q97.5,
-         response = "area_ghm",
-         order = 1) %>%
-  mutate(species = taxa) %>%
-  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, response, order)
-
-niche_meta_sg <- fread("~/Desktop/covid-results/niche_meta_sg.csv") %>%
-  mutate(species = rep(NA, nrow(.)),
-         common_name = rep("Mean response", nrow(.)),
-         taxa = Parameter,
-         sig_code = rep(NA, nrow(.)),
-         LCL = Q2.5,
-         HCL = Q97.5,
-         response = "niche_sg",
-         order = 1) %>%
-  mutate(species = taxa) %>%
-  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, response, order)
-
-niche_meta_ghm <- fread("~/Desktop/covid-results/niche_meta_ghm.csv") %>%
-  mutate(species = rep(NA, nrow(.)),
-         common_name = rep("Mean response", nrow(.)),
-         taxa = Parameter,
-         sig_code = rep(NA, nrow(.)),
-         LCL = Q2.5,
-         HCL = Q97.5,
-         response = "niche_ghm",
-         order = 1) %>%
-  mutate(species = taxa) %>%
-  select(species, common_name, taxa, sig_code, Estimate, LCL, HCL, response, order)
 
 species_name <- data.frame(scientific_name = sort(intersect(area_ghm$species, niche_ghm$species)),
                            common_name = c("Moose",
