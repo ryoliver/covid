@@ -99,7 +99,7 @@ species_name <- data.frame(scientific_name = sort(intersect(area_ghm$species, ni
                                            "Coyote",
                                            "Elk",
                                            "Ross's goose",
-                                           "Hen harrier",
+                                           "Northern harrier",
                                            "Common raven",
                                            "Bald eagle",
                                            "Bobcat",
