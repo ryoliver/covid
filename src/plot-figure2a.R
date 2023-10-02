@@ -105,13 +105,12 @@ mobility_order <- results %>%
   ungroup() %>%
   select(species, order)
 
-results <- left_join(results, mobility_order, by = "species") %>%
-  rbind(area_meta_sg, area_meta_ghm, niche_meta_sg, niche_meta_ghm) 
+results <- left_join(results, mobility_order, by = "species") 
 
 results$response <- factor(results$response,
                            levels = c("area_sg", "area_ghm", "niche_sg", "niche_ghm"))
 results$taxa <- factor(results$taxa,
-                       levels = c("classmammal","mammals", "classbird","birds"))
+                       levels = c("classbird","birds"))
 
 cougar <- results %>%
   filter(common_name == "Cougar")
@@ -123,7 +122,7 @@ results <- results %>%
 
 x_label <- "Effect size"
 
-p <- ggplot(results) +
+ggplot(results) +
   facet_grid(rows = vars(taxa), cols = vars(response), scales = "free_y", space = "free") +
   geom_segment(
     aes(x = LCL, y = reorder(common_name, -order), 
