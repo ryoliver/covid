@@ -176,14 +176,18 @@ setdiff(area_diff_df$species, niche_diff_df$species)
 area_diff_df <- area_diff_df %>%
   filter(species != "Haliaeetus leucocephalus")
 
-ggplot(area_diff_df, 
-       aes(x = diff_km, fill = taxa)) +
-  geom_histogram(breaks = seq(-30, 30, by = 1),
-                 position = "stack",
-                color = "#4a4e4d") +
+p1 <- ggplot(area_diff_df) +
+  geom_histogram(aes(x = diff_km,
+                     y = ..count..,
+                     fill = taxa,
+                     color = taxa),
+                 breaks = seq(-30, 30, by = 2),
+                 position = "stack") +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme_minimal() +
-  theme(panel.grid.major.y = element_blank(),
+  theme(
         panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
@@ -191,13 +195,44 @@ ggplot(area_diff_df,
         legend.title = element_blank(),
         #axis.text.y = element_blank(),
         axis.title = element_blank(),
-        axis.text = element_text(size = 6),
-        axis.title.x = element_text(size = 6, 
+        axis.text = element_text(size = 7),
+        axis.title.x = element_text(size = 8, 
                                     face = "bold"),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(expand = expansion(mult = c(0, .1))) +  
+  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0, .1))) +  
   labs(x = bquote(bold('Change in area size'~(km^2))))
 
+
+p2 <- ggplot(subset(niche_diff_df, !is.na(taxa))) +
+  geom_histogram(aes(x = percent_change,
+                     y = ..count..,
+                     fill = taxa,
+                     color = taxa),
+                 breaks = seq(-200, 200, by = 10),
+                 position = "stack") +
+  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
+  theme_minimal() +
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
+    legend.position = "none",
+    legend.title = element_blank(),
+    #axis.text.y = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_text(size = 7),
+    axis.title.x = element_text(size = 8, 
+                                face = "bold"),
+    axis.ticks.x = element_line(color = "#4a4e4d")) +
+  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0, .1))) +  
+  labs(x = bquote('Change in niche size (%)'))
+
+p <- p1/p2
+
+
+ggsave(p, file = "~/Desktop/figure4.pdf", width = 3.5, height = 2)
 
   
 
