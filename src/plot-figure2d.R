@@ -1,14 +1,9 @@
 library(data.table)
 library(tidyverse)
 library(ggplot2)
-library(ggthemes)
 library(patchwork)
-library(ggtext)
-library(extrafont)
 library(cowplot)
-library(grid)
-library(gridExtra)
-library(ggbeeswarm)
+
 
 rm(list = ls())
 
@@ -51,40 +46,33 @@ area_diff_df <- do.call("rbind", diff_out) %>%
                             diff_km < 0 ~ "n"),
          group = rep("a",nrow(.))) %>%
   mutate(taxa = case_when(species %in% c("Anas acuta",
-                                                 "Anas americana",
-                                                 "Anas clypeata",
-                                                 "Anas crecca",
-                                                 "Anas cyanoptera",
-                                                 "Anas platyrhynchos",
-                                                 "Anas strepera",
-                                                 "Anser albifrons",
-                                                 "Anser caerulescens",
-                                                 "Aquila chrysaetos",
-                                                 "Ardea alba",
-                                                 "Aquila chrysaetos",
-                                                 "Chen rossii",
-                                                 "Circus cyaneus",
-                                                 "Corvus corax",
-                                                 "Haliaeetus leucocephalus",
-                                                 "Rallus longirostris") ~ "birds",
+                                         "Anas americana",
+                                         "Anas clypeata",
+                                         "Anas crecca",
+                                         "Anas cyanoptera",
+                                         "Anas platyrhynchos",
+                                         "Anas strepera",
+                                         "Anser albifrons",
+                                         "Anser caerulescens",
+                                         "Aquila chrysaetos",
+                                         "Ardea alba",
+                                         "Aquila chrysaetos",
+                                         "Chen rossii",
+                                         "Circus cyaneus",
+                                         "Corvus corax",
+                                         "Haliaeetus leucocephalus",
+                                         "Rallus longirostris") ~ "birds",
                           species %in% c("Alces alces",
-                                                 "Antilocapra americana",
-                                                 "Canis latrans",
-                                                 "Cervus elaphus",
-                                                 "Lynx rufus",
-                                                 "Odocoileus hemionus",
-                                                 "Odocoileus virginianus",
-                                                 "Ovis canadensis",
-                                                 "Puma concolor",
-                                                 "Ursus americanus",
-                                                 "Ursus arctos") ~ "mammals")) 
-
-area_mean_diff <- area_diff_df %>% 
-  summarize(mdiff = mean(diff_km)) %>% 
-  pull(mdiff) %>% 
-  round(1)
-
-
+                                         "Antilocapra americana",
+                                         "Canis latrans",
+                                         "Cervus elaphus",
+                                         "Lynx rufus",
+                                         "Odocoileus hemionus",
+                                         "Odocoileus virginianus",
+                                         "Ovis canadensis",
+                                         "Puma concolor",
+                                         "Ursus americanus",
+                                         "Ursus arctos") ~ "mammals")) 
 
 
 pred_dat <- fread("~/Desktop/covid-results/niche_change_prediction_2023-09-27.csv")
@@ -149,67 +137,35 @@ niche_diff_df <- do.call("rbind", diff_out) %>%
                                          "Ovis canadensis",
                                          "Puma concolor",
                                          "Ursus americanus",
-                                         "Ursus arctos") ~ "mammals")) 
+                                         "Ursus arctos") ~ "mammals")) %>%
+  filter(!is.na(taxa))
 
+area_diff <- area_diff_df %>%
+  mutate(bin = cut(diff_km, 
+                   breaks = seq(-30, 30, by = 2),
+                   labels = seq(-29, 29, by = 2))) %>%
+  filter(!is.na(bin)) %>%
+  group_by(bin) %>%
+  arrange(taxa) %>%
+  mutate(y = seq(1:n()))  %>%
+  ungroup() %>%
+  mutate(x = as.numeric(as.character(bin)))
 
-niche_mean_diff <- niche_diff_df %>% 
-  summarize(mdiff = mean(percent_change, na.rm = TRUE)) %>% 
-  pull(mdiff) %>% 
-  round(1)
+niche_diff <- niche_diff_df %>%
+  mutate(bin = cut(percent_change, 
+                   breaks = seq(-200, 200, by = 10),
+                   labels = seq(-195, 195, by = 10))) %>%
+  filter(!is.na(bin)) %>%
+  group_by(bin) %>%
+  arrange(taxa) %>%
+  mutate(y = seq(1:n()))  %>%
+  ungroup() %>%
+  mutate(x = as.numeric(as.character(bin)))
 
+max_val <- max(c(abs(min(area_diff$x, na.rm = TRUE)), max(area_diff$x, na.rm = TRUE)))
 
-area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-09-26.csv")
-niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-09-27.csv")
-
-setdiff(area_diff_df$species, area_ghm$species)
-setdiff(area_ghm$species, area_diff_df$species)
-
-setdiff(niche_diff_df$species, niche_ghm$species)
-setdiff(niche_ghm$species, niche_diff_df$species)
-
-setdiff(niche_diff_df$species, area_diff_df$species)
-setdiff(area_diff_df$species, niche_diff_df$species)
-
-
-
-
-area_diff_df <- area_diff_df %>%
-  filter(species != "Haliaeetus leucocephalus")
-
-p1 <- ggplot(area_diff_df) +
-  geom_histogram(aes(x = diff_km,
-                     y = ..count..,
-                     fill = taxa,
-                     color = taxa),
-                 breaks = seq(-30, 30, by = 2),
-                 position = "stack") +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
-  theme_minimal() +
-  theme(
-        panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-        legend.position = "none",
-        legend.title = element_blank(),
-        #axis.text.y = element_blank(),
-        axis.title = element_blank(),
-        axis.text = element_text(size = 7),
-        axis.title.x = element_text(size = 8, 
-                                    face = "bold"),
-        axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0, .1))) +  
-  labs(x = bquote(bold('Change in area size'~(km^2))))
-
-
-p2 <- ggplot(subset(niche_diff_df, !is.na(taxa))) +
-  geom_histogram(aes(x = percent_change,
-                     y = ..count..,
-                     fill = taxa,
-                     color = taxa),
-                 breaks = seq(-200, 200, by = 10),
-                 position = "stack") +
+p1 <- ggplot(data = area_diff) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
   scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
@@ -226,99 +182,35 @@ p2 <- ggplot(subset(niche_diff_df, !is.na(taxa))) +
     axis.title.x = element_text(size = 8, 
                                 face = "bold"),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0, .1))) +  
-  labs(x = bquote('Change in niche size (%)'))
-
-p <- p1/p2
-
-
-ggsave(p, file = "~/Desktop/figure4.pdf", width = 3.5, height = 2)
-
-  
-
-max_val <- max(c(min(area_diff_df$diff_km, na.rm = TRUE), max(area_diff_df$diff_km, na.rm = TRUE)))
-
-
-ggplot(area_diff_df, aes(x = diff_km)) +
-  geom_dotplot(method = 'histodot', binwidth = 5) +
-  scale_x_continuous(breaks = seq(-30, 30, by = 5)) +
-  t
-
-max_val <- max(c(min(area_diff_df$diff_km, na.rm = TRUE), max(area_diff_df$diff_km, na.rm = TRUE)))
-
-
-p1 <- ggplot(area_diff_df, 
-             aes(x = -diff_km, y = group, color = taxa)) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
-  geom_vline(aes(xintercept = -area_mean_diff), linetype = "dotted", color = "#4a4e4d") +
-  geom_beeswarm(cex = 8, alpha = 0.7, size = 1) +
-  geom_point(aes(x = -area_mean_diff), size = 3, shape = 22, 
-             fill = "#ABB0AE", color = "#4A4E4D") +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  theme_minimal() +
-  theme(panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-        legend.position = "none",
-        legend.title = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title = element_blank(),
-        axis.text = element_text(size = 6),
-        axis.title.x = element_text(size = 6, 
-                                    face = "bold"),
-        axis.ticks.x = element_line(color = "#4a4e4d")) +
+  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.05, 0.05))) +  
   coord_cartesian(xlim = c(-max_val,max_val)) +
   labs(x = bquote(bold('Change in area size'~(km^2))))
 
-max_val <- max(c(min(niche_diff_df$percent_change, na.rm = TRUE), max(niche_diff_df$percent_change, na.rm = TRUE)))
+max_val <- max(c(abs(min(niche_diff$x, na.rm = TRUE)), max(niche_diff$x, na.rm = TRUE)))
 
-p2 <- ggplot(niche_diff_df, aes(x = percent_change, y = group, color = taxa)) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", alpha = 0.5, color = "#4a4e4d") +
-  geom_vline(aes(xintercept = niche_mean_diff), linetype = "dotted", color = "#4a4e4d") +
-  geom_beeswarm(cex = 8, alpha = 0.7, size = 1) +
-  geom_point(aes(x = niche_mean_diff), size = 3, shape = 22, 
-             fill = "#ABB0AE", color = "#4A4E4D") +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  theme_minimal() +
-  theme(panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-        legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title = element_blank(),
-        axis.text = element_text(size = 6),
-        axis.title.x = element_text(size = 6, 
-                                    face = "bold"),
-        axis.ticks.x = element_line(color = "#4a4e4d")) +
-  coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in niche size (%)'))
-
-p <- p1/p2
-
-ggsave(p, file = "~/Desktop/figure4.png", width = 3.5, height = 2)
-
-p1 <- ggplot(area_diff_df, aes(x = -diff_km, fill = taxa)) +
-  geom_dotplot(binwidth = 0.5,stackdir = "center", alpha = 0.7) +
+p2 <- ggplot(data = niche_diff) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_y_continuous(NULL, breaks = NULL) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme_minimal() +
-  theme(panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-        legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title = element_blank(),
-        axis.text = element_text(size = 6),
-        axis.title.x = element_text(size = 6, 
-                                    face = "bold"),
-        axis.ticks.x = element_line(color = "#4a4e4d")) +
-  labs(x = bquote(bold('Change in area size'~(km^2))))
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
+    legend.position = "none",
+    legend.title = element_blank(),
+    #axis.text.y = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_text(size = 7),
+    axis.title.x = element_text(size = 8, 
+                                face = "bold"),
+    axis.ticks.x = element_line(color = "#4a4e4d")) +
+  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.15, 0.15))) +  
+  coord_cartesian(xlim = c(-max_val,max_val)) +
+  labs(x = bquote('Change in niche size (%)'))
 
-p <- p1/p2
 
-ggsave(p, file = "~/Desktop/figure4.png", width = 3.5, height = 2)
-
-
+p <- p1/p2 +
+  plot_layout(heights = c(2.5, 1))
+ggsave(p, file = "~/Desktop/figure2d.pdf", width = 3.5, height = 2.5)
