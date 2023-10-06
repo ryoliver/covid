@@ -138,12 +138,9 @@ p <- ggplot(results) +
         legend.position = "none",
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        
-        plot.title = element_text(face = "bold"),
         axis.text = element_text(size = 7),
         axis.title.y = element_blank(),
-        axis.title.x = element_text(size = 8, 
-                                    face = "bold"),
+        axis.title.x = element_text(size = 7),
         axis.ticks.x = element_line(color = "#4a4e4d")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme(strip.text = element_blank(),
