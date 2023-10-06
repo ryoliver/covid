@@ -211,4 +211,4 @@ p2 <- ggplot(data = niche_diff) +
 
 p <- p1/p2 +
   plot_layout(heights = c(2.5, 1))
-ggsave(p, file = "~/Desktop/figure2d.pdf", width = 3.5, height = 2)
+ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 2)
