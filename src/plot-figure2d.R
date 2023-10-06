@@ -165,7 +165,7 @@ niche_diff <- niche_diff_df %>%
 max_val <- max(c(abs(min(area_diff$x, na.rm = TRUE)), max(area_diff$x, na.rm = TRUE)))
 
 p1 <- ggplot(data = area_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
   scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
@@ -179,17 +179,16 @@ p1 <- ggplot(data = area_diff) +
     #axis.text.y = element_blank(),
     axis.title = element_blank(),
     axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 8, 
-                                face = "bold"),
+    axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
   scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.05, 0.05))) +  
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote(bold('Change in area size'~(km^2))))
+  labs(x = bquote('Change in area size'~(km^2)))
 
 max_val <- max(c(abs(min(niche_diff$x, na.rm = TRUE)), max(niche_diff$x, na.rm = TRUE)))
 
 p2 <- ggplot(data = niche_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
   scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
@@ -203,8 +202,7 @@ p2 <- ggplot(data = niche_diff) +
     #axis.text.y = element_blank(),
     axis.title = element_blank(),
     axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 8, 
-                                face = "bold"),
+    axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
   scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.15, 0.15))) +  
   coord_cartesian(xlim = c(-max_val,max_val)) +
@@ -213,4 +211,4 @@ p2 <- ggplot(data = niche_diff) +
 
 p <- p1/p2 +
   plot_layout(heights = c(2.5, 1))
-ggsave(p, file = "~/Desktop/figure2d.pdf", width = 3.5, height = 2.5)
+ggsave(p, file = "~/Desktop/figure2d.pdf", width = 3.5, height = 2)
