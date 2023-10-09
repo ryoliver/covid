@@ -4,7 +4,6 @@ library(ggplot2)
 library(patchwork)
 library(cowplot)
 
-
 rm(list = ls())
 
 pred_dat <- fread("~/Desktop/covid-results/area_change_prediction_2023-09-27.csv")
@@ -199,7 +198,6 @@ p2 <- ggplot(data = niche_diff) +
     axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
     legend.position = "none",
     legend.title = element_blank(),
-    #axis.text.y = element_blank(),
     axis.title = element_blank(),
     axis.text = element_text(size = 7),
     axis.title.x = element_text(size = 7),
