@@ -104,7 +104,7 @@ hist(niche_diff_df$percent_change)
 area_diff <- area_diff_df %>%
   select(species, common_name, taxa, diff_km) %>%
   mutate(bin = cut(diff_km, 
-                   breaks = c(-1000,-100,-10,-1,-0.5,0,0.5,1,10,100,1000),
+                   breaks = c(-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000),
                    labels = c(-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5))) %>%
   filter(!is.na(bin)) %>%
   group_by(bin) %>%
@@ -118,7 +118,7 @@ area_diff$taxa[area_diff$species== "Puma concolor"] <- "mammals"
 max_val <- max(c(abs(min(area_diff$x)), max(area_diff$x)))
 
 
-p1 <- ggplot(data = area_diff) +
+ggplot(data = area_diff) +
   geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
   scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
