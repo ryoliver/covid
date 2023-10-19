@@ -167,6 +167,6 @@ p2 <- ggplot(data = niche_diff) +
   labs(x = bquote('Change in niche size (%)'))
 
 p <- p1/p2 +
-  plot_layout(heights = c(1, 2))
-ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 2)
+  plot_layout(heights = c(0.8, 2))
+ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 1.8)
 
