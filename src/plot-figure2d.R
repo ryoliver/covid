@@ -7,7 +7,7 @@ library(cowplot)
 rm(list = ls())
 species_list <- fread("src/species_list.csv")
 
-pred_dat <- fread("~/Desktop/covid-results/area_change_prediction_2023-10-17.csv")
+pred_dat <- fread("~/Desktop/covid-results/area_change_prediction_2023-10-18.csv")
 
 spl <- unique(pred_dat$species)
 
@@ -48,7 +48,7 @@ area_diff_df <- do.call("rbind", diff_out) %>%
   left_join(., species_list, by = c("species" = "scientific_name"))
 
 
-pred_dat <- fread("~/Desktop/covid-results/niche_change_prediction_2023-10-17.csv")
+pred_dat <- fread("~/Desktop/covid-results/niche_change_prediction_2023-10-19.csv")
 
 spl <- unique(pred_dat$species)
 
@@ -86,20 +86,6 @@ niche_diff_df <- do.call("rbind", diff_out) %>%
   left_join(., species_list, by = c("species" = "scientific_name"))
 
 
-# check consistency with other results
-area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-10-17.csv")
-niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-10-17.csv")
-
-print("missing area predictions:")
-setdiff(area_ghm$species,area_diff_df$species)
-
-print("missing niche predictions:")
-setdiff(niche_ghm$species,niche_diff_df$species)
-
-  
-hist(area_diff_df$diff_km)  
-hist(niche_diff_df$percent_change)
-
 
 area_diff <- area_diff_df %>%
   select(species, common_name, taxa, diff_km) %>%
@@ -113,38 +99,11 @@ area_diff <- area_diff_df %>%
   ungroup() %>%
   mutate(x = as.numeric(as.character(bin))) 
 
-area_diff$taxa[area_diff$species== "Puma concolor"] <- "mammals"
-
-max_val <- max(c(abs(min(area_diff$x)), max(area_diff$x)))
-
-
-ggplot(data = area_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
-  theme_minimal() +
-  theme(
-    panel.grid.minor.y = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-    legend.position = "none",
-    legend.title = element_blank(),
-    #axis.text.y = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 7),
-    axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.1, 0.1))) +  
-  scale_x_continuous(breaks = seq(-4,4, by = 1),
-                     labels = c(-100,-10,-1,-0.5,0,0.5,1,10,100)) +
-  coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in area size'~(km^2)))
 
 niche_diff <- niche_diff_df %>%
   select(species, common_name, taxa, percent_change) %>%
   mutate(bin = cut(percent_change, 
-                   breaks = c(-1000,-100,-10,-1,-0.5,0,0.5,1,10,100,1000),
+                   breaks = c(-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000),
                    labels = c(-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5))) %>%
   filter(!is.na(bin)) %>%
   group_by(bin) %>%
@@ -153,13 +112,15 @@ niche_diff <- niche_diff_df %>%
   ungroup() %>%
   mutate(x = as.numeric(as.character(bin))) 
 
+area_diff$taxa[area_diff$species== "Puma concolor"] <- "mammals"
 niche_diff$taxa[niche_diff$species== "Puma concolor"] <- "mammals"
 
-max_val <- max(c(abs(min(niche_diff$x)), max(niche_diff$x)))
+
+max_val <- max(c(abs(min(area_diff$x)), max(area_diff$x),abs(min(niche_diff$x)), max(niche_diff$x)))
 
 
-p2 <- ggplot(data = niche_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
+p1 <- ggplot(data = area_diff) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
   scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
   scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
@@ -175,9 +136,33 @@ p2 <- ggplot(data = niche_diff) +
     axis.text = element_text(size = 7),
     axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.1, 0.1))) +  
+  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.5, 0.5))) +  
   scale_x_continuous(breaks = seq(-4,4, by = 1),
-                     labels = c(-100,-10,-1,-0.5,0,0.5,1,10,100)) +
+                     labels = c(-100,-10,-1,-0.1,0,0.1,1,10,100)) +
+  coord_cartesian(xlim = c(-max_val,max_val)) +
+  labs(x = bquote('Change in area size'~(km^2)))
+
+
+p2 <- ggplot(data = niche_diff) +
+  geom_point(aes(x = x, y = y, color = taxa), size = 2) +
+  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
+  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
+  theme_minimal() +
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
+    legend.position = "none",
+    legend.title = element_blank(),
+    #axis.text.y = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_text(size = 7),
+    axis.title.x = element_text(size = 7),
+    axis.ticks.x = element_line(color = "#4a4e4d")) +
+  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.5))) +  
+  scale_x_continuous(breaks = seq(-4,4, by = 1),
+                     labels = c(-100,-10,-1,-0.1,0,0.1,1,10,100)) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
   labs(x = bquote('Change in niche size (%)'))
 
@@ -185,79 +170,3 @@ p <- p1/p2 +
   plot_layout(heights = c(1, 2))
 ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 2)
 
-
-if(1 == 2){
-  
-
-area_diff <- area_diff_df %>%
-  mutate(bin = cut(diff_km, 
-                   breaks = seq(-30, 30, by = 2),
-                   labels = seq(-29, 29, by = 2))) %>%
-  filter(!is.na(bin)) %>%
-  group_by(bin) %>%
-  arrange(taxa) %>%
-  mutate(y = seq(1:n()))  %>%
-  ungroup() %>%
-  mutate(x = as.numeric(as.character(bin)))
-
-niche_diff <- niche_diff_df %>%
-  mutate(bin = cut(percent_change, 
-                   breaks = seq(-200, 200, by = 10),
-                   labels = seq(-195, 195, by = 10))) %>%
-  filter(!is.na(bin)) %>%
-  group_by(bin) %>%
-  arrange(taxa) %>%
-  mutate(y = seq(1:n()))  %>%
-  ungroup() %>%
-  mutate(x = as.numeric(as.character(bin)))
-
-max_val <- max(c(abs(min(area_diff$x, na.rm = TRUE)), max(area_diff$x, na.rm = TRUE)))
-
-p1 <- ggplot(data = area_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
-  theme_minimal() +
-  theme(
-    panel.grid.minor.y = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-    legend.position = "none",
-    legend.title = element_blank(),
-    #axis.text.y = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 7),
-    axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.05, 0.05))) +  
-  coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in area size'~(km^2)))
-
-max_val <- max(c(abs(min(niche_diff$x, na.rm = TRUE)), max(niche_diff$x, na.rm = TRUE)))
-
-p2 <- ggplot(data = niche_diff) +
-  geom_point(aes(x = x, y = y, color = taxa), size = 1.2) +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
-  geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
-  theme_minimal() +
-  theme(
-    panel.grid.minor.y = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
-    legend.position = "none",
-    legend.title = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 7),
-    axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 4), expand = expansion(mult = c(0.15, 0.15))) +  
-  coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in niche size (%)'))
-
-
-p <- p1/p2 +
-  plot_layout(heights = c(2.5, 1))
-ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 2)
-}
