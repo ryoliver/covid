@@ -1,0 +1,64 @@
+---
+title: "COVID Initiative North American data summary"
+author: "Ruth Oliver"
+date: "2023-11-06"
+output: pdf_document
+---
+## Overview
+Below is a quick summary of animal location data contributed to the COVID-19 Bio-Logging Initiative located in North America.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = TRUE)
+```
+
+
+```{r load, echo=FALSE}
+library(tidyverse)
+library(sf)
+library(data.table)
+rm(list = ls())
+
+
+d <- fread("~/Desktop/covid-results/final_evt_for_map.csv")
+
+# species list + taxonomy
+species_list <- fread("~/Documents/repos/covid/src/species_list.csv")
+species_list$taxa[species_list$scientific_name== "Puma concolor"] <- "mammals"
+```
+**Filter to individuals with high density data February-April 2020**
+```{r filter2020}
+individuals_spring2020 <- d %>%
+  mutate(year = year(timestamp),
+         month = month(timestamp),
+         doy = yday(timestamp)) %>%
+  filter(year == 2020) %>%
+  filter(month > 1) %>%
+  filter(month < 5) %>%
+  group_by(individual_id) %>%
+  summarise(n_records = n(),
+            n_days = n_distinct(doy)) %>%
+  mutate(records_per_day = n_records/n_days)
+
+individuals_spring2020_20fixes <- individuals_spring2020 %>%
+  filter(records_per_day > 20)
+
+print(paste("n individuals with > 20 average fixes per day (Feb-April):", nrow(individuals_spring2020_20fixes)))
+```
+
+**Summarize by species**
+```{r}
+summary <- d %>%
+  filter(individual_id %in% individuals_spring2020$individual_id) %>%
+  group_by(taxon_canonical_name) %>%
+  summarise(n_individuals = n_distinct(individual_id),
+            n_locations = n(),
+            n_studies = n_distinct(study_id)) %>%
+  mutate(mean_locations = n_locations/n_individuals) %>%
+  left_join(.,species_list, by = c("taxon_canonical_name" ="scientific_name")) %>%
+  select(taxa, taxon_canonical_name, common_name, 
+         n_studies, n_individuals, n_locations, mean_locations) %>%
+  arrange(taxa, n_locations) 
+
+summary %>% 
+  knitr::kable("latex",col.names = gsub("[_]", " ", names(summary)))
+```
+
