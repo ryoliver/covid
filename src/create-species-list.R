@@ -81,9 +81,9 @@ species_list <- data.frame(scientific_name = unique(c(area_ghm$species,
                                                  "Odocoileus hemionus",
                                                  "Odocoileus virginianus",
                                                  "Ovis canadensis",
+                                                 "Puma concolor",
                                                  "Ursus americanus",
-                                                 "Ursus arctos") ~ "mammals",
-                          scientific_name %in% c("Puma concolor") ~ "cougar")) 
+                                                 "Ursus arctos") ~ "mammals")) 
 
 fwrite(species_list,"src/species_list.csv")
   

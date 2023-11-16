@@ -36,6 +36,7 @@ niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-10-17.csv") %>%
 
 # species list + taxonomy
 species_list <- fread("src/species_list.csv")
+species_list$taxa[species_list$scientific_name== "Puma concolor"] <- "cougar"
 
 
 

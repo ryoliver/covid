@@ -8,7 +8,6 @@ rm(list = ls())
 
 # species list + taxonomy
 species_list <- fread("src/species_list.csv")
-species_list$taxa[species_list$scientific_name== "Puma concolor"] <- "mammals"
 
 
 d <- fread("~/Desktop/covid-results/final_evt_for_map.csv")
