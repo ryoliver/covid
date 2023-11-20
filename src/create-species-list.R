@@ -5,18 +5,18 @@ rm(list = ls())
 
 
 # species results
-area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-10-17.csv") %>%
+area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-11-20.csv") %>%
   select(species)
 
-area_sg <- fread("~/Desktop/covid-results/area_sg_effects_2023-10-17.csv") %>%
+area_sg <- fread("~/Desktop/covid-results/area_sg_effects_2023-11-20.csv") %>%
   mutate(response = rep("area_sg", nrow(.))) %>%
   select(species)
 
-niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-10-17.csv") %>%
+niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-11-20.csv") %>%
   mutate(response = rep("niche_ghm", nrow(.))) %>%
   select(species)
 
-niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-10-17.csv") %>%
+niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-11-20.csv") %>%
   mutate(response = rep("niche_sg", nrow(.))) %>%
   select(species)
 
@@ -48,9 +48,10 @@ species_list <- data.frame(scientific_name = unique(c(area_ghm$species,
                                  scientific_name == "Grus canadensis" ~ "Sandhill crane",
                                  scientific_name == "Haliaeetus leucocephalus" ~ "Bald eagle",
                                  scientific_name == "Lynx rufus" ~ "Bobcat",
+                                 scientific_name == "Numenius americanus" ~ "Long-billed curlew",
                                  scientific_name == "Odocoileus hemionus" ~ "Mule deer",
                                  scientific_name == "Odocoileus virginianus" ~ "White-tailed deer",
-                                 scientific_name == "Ovis canadensis" ~ "Big-horned sheep",
+                                 scientific_name == "Ovis canadensis" ~ "Bighorn sheep",
                                  scientific_name == "Puma concolor" ~ "Cougar",
                                  scientific_name == "Ursus americanus" ~ "Black bear",
                                  scientific_name == "Ursus arctos" ~ "Brown bear")) %>%
@@ -70,6 +71,7 @@ species_list <- data.frame(scientific_name = unique(c(area_ghm$species,
                                                  "Circus cyaneus",
                                                  "Corvus corax",
                                                  "Haliaeetus leucocephalus",
+                                                 "Numenius americanus",
                                                  "Rallus longirostris",
                                                  "Anas discors",
                                                  "Grus canadensis") ~ "birds",
