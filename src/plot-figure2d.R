@@ -7,7 +7,7 @@ library(cowplot)
 rm(list = ls())
 species_list <- fread("src/species_list.csv")
 
-pred_dat <- fread("~/Desktop/covid-results/area_change_prediction_2023-10-18.csv")
+pred_dat <- fread("~/Desktop/covid-results/area_change_prediction_2023-11-20.csv")
 
 spl <- unique(pred_dat$species)
 
@@ -48,7 +48,7 @@ area_diff_df <- do.call("rbind", diff_out) %>%
   left_join(., species_list, by = c("species" = "scientific_name"))
 
 
-pred_dat <- fread("~/Desktop/covid-results/niche_change_prediction_2023-10-19.csv")
+pred_dat <- fread("~/Desktop/covid-results/niche_change_prediction_2023-11-20.csv")
 
 spl <- unique(pred_dat$species)
 
@@ -167,6 +167,6 @@ p2 <- ggplot(data = niche_diff) +
   labs(x = bquote('Change in niche size (%)'))
 
 p <- p1/p2 +
-  plot_layout(heights = c(0.8, 2))
-ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 1.8)
+  plot_layout(heights = c(1, 1.8))
+ggsave(p, file = "~/Desktop/figure2d.pdf", width = 2.5, height = 2)
 
