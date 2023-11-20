@@ -18,19 +18,19 @@ mammal_icon <-  "~/Desktop/covid-results/images/carnivore.png"
 bird_icon <- "~/Desktop/covid-results/images/corvid.png"
 
 # species results
-area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-10-17.csv") %>%
+area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-11-20.csv") %>%
   mutate(response = rep("area_ghm", nrow(.))) %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
-area_sg <- fread("~/Desktop/covid-results/area_sg_effects_2023-10-17.csv") %>%
+area_sg <- fread("~/Desktop/covid-results/area_sg_effects_2023-11-20.csv") %>%
   mutate(response = rep("area_sg", nrow(.))) %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
-niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-10-17.csv") %>%
+niche_ghm <- fread("~/Desktop/covid-results/niche_ghm_effects_2023-11-20.csv") %>%
   mutate(response = rep("niche_ghm", nrow(.))) %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
-niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-10-17.csv") %>%
+niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-11-20.csv") %>%
   mutate(response = rep("niche_sg", nrow(.))) %>%
   select(species, Estimate, LCL, HCL, sig_code, response)
 
