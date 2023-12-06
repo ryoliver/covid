@@ -38,6 +38,8 @@ niche_sg <- fread("~/Desktop/covid-results/niche_sg_effects_2023-11-20.csv") %>%
 species_list <- fread("src/species_list.csv")
 species_list$taxa[species_list$scientific_name== "Puma concolor"] <- "cougar"
 
+species_list$taxa[species_list$scientific_name== "Numenius americanus"] <- "curlew"
+
 
 
 
@@ -67,10 +69,15 @@ results <- left_join(results, mobility_order, by = "species")
 results$response <- factor(results$response,
                            levels = c("area_sg", "niche_sg", "area_ghm", "niche_ghm"))
 results$taxa <- factor(results$taxa,
-                       levels = c("cougar","mammals","birds"))
+                       levels = c("cougar","mammals","curlew","birds"))
 
 
 x_label <- "Effect size"
+
+sig_species <- results %>%
+  filter(sig_code != "ns_add") %>%
+  distinct(species) %>%
+  left_join(., species_list, by = c("species" = "scientific_name"))
 
 p <- ggplot(results) +
   ggh4x::facet_grid2(taxa~response, scales = "free", independent = "x", space = "free") +
@@ -88,9 +95,30 @@ p <- ggplot(results) +
              size = 2) +
   scale_color_manual(name ="model structure",
                      values = c("#F98177","#8895BF","#aeb6bf","#6BB0B3")) +
+  scale_y_discrete(labels=c( "Moose"=expression(bold(Moose)),
+                             "Pronghorn"=expression(bold(Pronghorn)),
+                             "Great egret"=expression(bold("Great egret")),
+                             "Coyote"=expression(bold(Coyote)),
+                             "Common raven"=expression(bold("Common raven")),
+                             "Bobcat"=expression(bold(Bobcat)),
+                             "Long-billed curlew"=expression(bold("Long-billed curlew")),
+                             "Mule deer"=expression(bold("Mule deer")),
+                             "Bighorn sheep"=expression(bold("Bighorn sheep")),
+                             "Cougar"=expression(bold(Cougar)),
+                             "Brown bear"=expression(bold("Brown bear")),
+                             "Northern harrier"=expression(bold("Northern harrier")),
+                             "White-tailed deer"=expression(bold("White-tailed deer")),
+                             "Cinnamon teal"=expression(bold("Cinnamon teal")),
+                             "Mallard"=expression(bold(Mallard)),
+                             "Snow goose"=expression(bold("Snow goose")),
+                             "Elk"=expression(bold(Elk)),
+                             "Northern shoveler"=expression(bold("Northern shoveler")),
+                             "Gadwall"=expression(bold(Gadwall)),
+                             parse=TRUE)) +
+  
   xlab(x_label) +
   theme_minimal() +
-  theme(panel.border = element_rect(colour = "#4a4e4d", fill=NA, size=1),
+  theme(panel.border = element_rect(colour = "#aeb6bf", fill=NA, size=1),
         legend.position = "none",
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -100,9 +128,10 @@ p <- ggplot(results) +
         axis.ticks.x = element_line(color = "#4a4e4d")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme(
+        #axis.text.y = element_text(face = ifelse(results$common_name %in% sig_species$common_name, "bold", "italic")),
         strip.text = element_blank(),
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))
 
-ggsave(p, file = "~/Desktop/fig2a.pdf", width = 170, height = 90, units = "mm")
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 170, height = 100, units = "mm")
 
