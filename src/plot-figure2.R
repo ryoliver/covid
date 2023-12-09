@@ -133,12 +133,18 @@ p <- ggplot(results) +
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))
 
-ggsave(p, file = "~/Desktop/fig2a.pdf", width = 170, height = 100, units = "mm")
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 165, height = 110, units = "mm")
+
+results_clean <- results %>%
+  mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification"),
+         response = case_when(response == "area_sg" ~ "area size",
+                              response == "area_ghm" ~ "area size",
+                              response == "niche_sg" ~ "niche size",
+                              response == "niche_ghm" ~ "niche size")) %>%
+  filter(!sig_code %in% c("low_int", "ns_add"))
 
 # species that show responses in both area AND niche size
-species_both_responses <- results %>%
-  mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification")) %>%
-  filter(!sig_code %in% c("low_int", "ns_add")) %>%
+species_both_responses <- results_clean %>%
   group_by(driver, species) %>%
   summarise(n_responses = n()) %>%
   filter(n_responses > 1)
@@ -150,44 +156,106 @@ summarize_species_both_responses <- species_both_responses %>%
   mutate(response = rep("both", n()))
 
 # count number of species that respond in either area OR niche size
-summarize_species_single_response <- results %>%
-  mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification")) %>%
-  filter(!sig_code %in% c("low_int", "ns_add")) %>%
-  filter(!species %in% species_both_responses$species) %>%
-  select(species, response, driver) %>%
-  group_by(driver, response) %>%
+species_single_response <- results_clean %>%
+  group_by(driver, species) %>%
+  summarise(n_responses = n()) %>%
+  filter(n_responses == 1) 
+
+summarize_species_single_response <- results_clean %>%
+  left_join(., species_single_response) %>% 
+  filter(!is.na(n_responses)) %>%
+  group_by(response, driver) %>%
   summarise(n_species = n())
 
 # combine summaries
-summarize_species <- rbind(summarize_species_both_responses, summarize_species_single_response) %>%
+summarize_species_drivers <- rbind(summarize_species_both_responses, summarize_species_single_response) %>%
   arrange(driver) %>%
-  mutate(response = case_when(response == "area_sg" ~ "area size",
-                              response == "area_ghm" ~ "area size",
-                              response == "niche_sg" ~ "niche size",
-                              response == "niche_ghm" ~ "niche size",
-                              response == "both" ~ "both"),
-         driver = case_when(driver == "mobility" ~ "human mobility",
+  mutate(driver = case_when(driver == "mobility" ~ "human mobility",
                             driver == "modification" ~ "landscape modification"))
 
-summarize_species$driver <- factor(summarize_species$driver,
-                                   levels = c("landscape modification","human mobility"))
+summarize_species_drivers$driver <- factor(summarize_species_drivers$driver,
+                                           levels = c("landscape modification","human mobility"))
 
-p_drivers <- ggplot(summarize_species, aes(fill=response, y=driver, x=n_species)) + 
+summarize_species_drivers$response <- factor(summarize_species_drivers$response,
+       levels = c("niche size", "both","area size"))
+
+p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=n_species)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#F3B391", "#F6D4BA","#FEFADC")) +
+  scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
+  
+  scale_y_discrete(labels = c("human mobility" = "human\nmobility",
+                              "landscape modification" = "landscape\nmodification")) +
   theme_minimal() +
   theme(
     legend.position = "none",
-    #panel.grid.major.x = element_blank(),
+    legend.title = element_text(size = 7),
     panel.grid.major.y = element_blank(),
     panel.grid.minor.x = element_blank(),
+    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
     legend.text = element_text(size = 7),
     axis.text = element_text(size = 7),
+    #axis.text.y = element_text(face = "bold"),
     axis.title.y = element_blank(),
     axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
   labs(x = "Species (n)")
 
-ggsave(p_drivers, file = "~/Desktop/fig2b.pdf", width = 85, height = 30, units = "mm")
+# species that show drivers in both area AND niche size
+species_both_drivers <- results_clean %>%
+  group_by(response, species) %>%
+  summarise(n_drivers = n()) %>%
+  filter(n_drivers > 1)
 
+# count number of species that show drivers in both area AND niche size per driver
+summarize_species_both_drivers <- species_both_drivers %>%
+  group_by(response) %>%
+  summarise(n_species = n()) %>%
+  mutate(driver = rep("both", n()))
+
+# count number of species that respond in either area OR niche size
+species_single_driver <- results_clean %>%
+  group_by(response, species) %>%
+  summarise(n_drivers = n()) %>%
+  filter(n_drivers == 1) 
+
+summarize_species_single_driver <- results_clean %>%
+  left_join(., species_single_driver) %>% 
+  filter(!is.na(n_drivers)) %>%
+  group_by(response, driver) %>%
+  summarise(n_species = n())
+
+# combine summaries
+summarize_species_responses <- rbind(summarize_species_both_drivers, summarize_species_single_driver) %>%
+  arrange(response) %>%
+  mutate(driver = case_when(driver == "mobility" ~ "human mobility",
+                            driver == "modification" ~ "landscape modification",
+                            driver == "both" ~ "both"))
+
+summarize_species_responses$driver <- factor(summarize_species_responses$driver,
+                                             levels = c("landscape modification","both","human mobility"))
+
+summarize_species_responses$response <- factor(summarize_species_responses$response,
+                                               levels = c("niche size", "area size"))
+
+p_responses <- ggplot(summarize_species_responses, aes(fill=driver, y=response, x=n_species)) + 
+  geom_bar(position="stack", stat="identity") +
+  scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    legend.title = element_text(size = 7),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    legend.text = element_text(size = 7),
+    axis.text = element_text(size = 7),
+    #axis.text.y = element_text(face = "bold"),
+    axis.title.y = element_blank(),
+    axis.title.x = element_text(size = 7),
+    axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
+    axis.ticks.x = element_line(color = "#4a4e4d")) +
+  labs(x = "Species (n)")
+
+p_all <- p_responses + p_drivers
+
+ggsave(p_all, file = "~/Desktop/fig2b.pdf", width = 170, height = 30, units = "mm")
 
