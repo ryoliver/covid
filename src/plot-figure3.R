@@ -15,12 +15,12 @@ pal <- c("#8895BF","#F98177")
 #-- Load Data --#
 
 #- Niche model
-load("~/Desktop/covid-results/niche_intra_ind_int_mod_2023-09-27.rdata")
+load("~/Desktop/covid-results/niche_intra_ind_int_mod_2023-11-20.rdata")
 niche_out <- out
 niche_int_mod <- niche_out$mod
 
 #- Area Model
-load("~/Desktop/covid-results/size_intra_ind_int_mod_2023-09-27.rdata")
+load("~/Desktop/covid-results/size_intra_ind_int_mod_2023-11-20.rdata")
 area_out <- out
 area_int_mod <- out$mod
 
@@ -67,7 +67,7 @@ niche_ce_int <- conditional_effects(x=niche_int_mod,
     scale_x_continuous(expand = expansion(mult = c(0, 0)),
                        breaks = seq(0,1, by = 0.0005),
                        labels = scales::comma) +  
-    labs(x = "Relative change in human mobility", y = "Standardized \n change in niche size")
+    labs(x = "Relative change in \n human mobility", y = "Standardized change \n in niche size")
 )
 
 #- Area Model
@@ -108,14 +108,18 @@ area_ce_int <- conditional_effects(x=area_int_mod,
     scale_x_continuous(expand = expansion(mult = c(0, 0)),
                        breaks = seq(0,1, by = 0.0005),
                        labels = scales::comma) +  
-    labs(x = "Relative change in human mobility", y = "Standardized  \n change in area size")
+    labs(x = "Relative change in \n human mobility", y = "Standardized change \n in area size")
 )
 
 #- Combine plots
 
 (comb_plot <- area_int_ce_plot + niche_int_ce_plot + plot_layout(guides = "collect"))
 
-ggsave(comb_plot, file = "~/Desktop/figure2c.pdf", height = 1.8, width = 3.6)
+ggsave(comb_plot, file = "~/Desktop/figure3.pdf", height = 45, width = 90, units = "mm")
+
+
+
+
 
 
 ####----    Summarize effects Size ----####
