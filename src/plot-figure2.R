@@ -181,7 +181,7 @@ summarize_species_drivers$response <- factor(summarize_species_drivers$response,
 
 p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=n_species)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
+  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
   
   scale_y_discrete(labels = c("human mobility" = "human\nmobility",
                               "landscape modification" = "landscape\nmodification")) +
@@ -239,7 +239,9 @@ summarize_species_responses$response <- factor(summarize_species_responses$respo
 
 p_responses <- ggplot(summarize_species_responses, aes(fill=driver, y=response, x=n_species)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
+  #scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
+  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
+  
   theme_minimal() +
   theme(
     legend.position = "none",
