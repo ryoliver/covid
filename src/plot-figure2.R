@@ -133,7 +133,7 @@ p <- ggplot(results) +
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))
 
-ggsave(p, file = "~/Desktop/fig2a.pdf", width = 160, height = 110, units = "mm")
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 175, height = 110, units = "mm")
 
 results_clean <- results %>%
   mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification"),
