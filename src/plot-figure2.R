@@ -133,7 +133,7 @@ p <- ggplot(results) +
         panel.spacing.x = unit(0.5, "lines"),
         panel.spacing.y = unit(0.2, "lines"))
 
-ggsave(p, file = "~/Desktop/fig2a.pdf", width = 165, height = 110, units = "mm")
+ggsave(p, file = "~/Desktop/fig2a.pdf", width = 160, height = 110, units = "mm")
 
 results_clean <- results %>%
   mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification"),
@@ -179,7 +179,15 @@ summarize_species_drivers$driver <- factor(summarize_species_drivers$driver,
 summarize_species_drivers$response <- factor(summarize_species_drivers$response,
        levels = c("niche size", "both","area size"))
 
-p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=n_species)) + 
+total_species_drivers <- summarize_species_drivers %>%
+  group_by(driver) %>%
+  summarise("n_total" = sum(n_species))
+
+summarize_species_drivers <- summarize_species_drivers %>%
+  left_join(., total_species_drivers, by = "driver") %>%
+  mutate("percent_species" = (n_species/n_total)*100)
+
+p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=percent_species)) + 
   geom_bar(position="stack", stat="identity") +
   scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
   
@@ -198,7 +206,7 @@ p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=n_
     axis.title.y = element_blank(),
     axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  labs(x = "Species (n)")
+  labs(x = "Species (%)")
 
 # species that show drivers in both area AND niche size
 species_both_drivers <- results_clean %>%
@@ -237,7 +245,15 @@ summarize_species_responses$driver <- factor(summarize_species_responses$driver,
 summarize_species_responses$response <- factor(summarize_species_responses$response,
                                                levels = c("niche size", "area size"))
 
-p_responses <- ggplot(summarize_species_responses, aes(fill=driver, y=response, x=n_species)) + 
+total_species_responses <- summarize_species_responses %>%
+  group_by(response) %>%
+  summarise("n_total" = sum(n_species))
+
+summarize_species_responses <- summarize_species_responses %>%
+  left_join(., total_species_responses, by = "response") %>%
+  mutate("percent_species" = (n_species/n_total)*100)
+
+p_responses <- ggplot(summarize_species_responses, aes(fill=driver, y=response, x=percent_species)) + 
   geom_bar(position="stack", stat="identity") +
   #scale_fill_manual(values = c("#556677", "#93A3B4","#C3CCD5")) +
   scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
@@ -255,9 +271,13 @@ p_responses <- ggplot(summarize_species_responses, aes(fill=driver, y=response, 
     axis.title.x = element_text(size = 7),
     axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  labs(x = "Species (n)")
+  labs(x = "Species (%)")
 
 p_all <- p_responses + p_drivers
 
 ggsave(p_all, file = "~/Desktop/fig2b.pdf", width = 170, height = 30, units = "mm")
+
+summarize_species_responses
+
+summarize_species_drivers
 
