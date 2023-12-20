@@ -89,6 +89,9 @@ hex <- st_make_grid(d_sf, n = c(100,100),
   st_sf() %>%
   rowid_to_column('hex_id')
 
+d_sf <- d_sf %>%
+  select(event_id)
+
 d_sf_hex <- st_join(d_sf, hex, join=st_within) %>%
   st_set_geometry(NULL) %>%
   count(name = "events", hex_id)
@@ -125,5 +128,5 @@ p <- us_map +
   guides(fill = guide_colorbar(title.position = "top")) +
   labs(fill = "Animal locations (n)") 
 
-ggsave(p, file = "~/Desktop/figure1.pdf", width = 4, height = 5)
+ggsave(p, file = "~/Desktop/figure1.pdf", width = 5, height = 5)
 
