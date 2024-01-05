@@ -170,3 +170,36 @@ p <- p1/p2 +
   plot_layout(heights = c(1, 1.7))
 ggsave(p, file = "~/Desktop/figure4.pdf", height = 50, width = 90, units = "mm")
 
+area_diff_df_mammals <- area_diff_df %>%
+  filter(taxa == "mammals")
+  
+median(area_diff_df_mammals$diff_km)
+mean(area_diff_df_mammals$diff_km)
+range(area_diff_df_mammals$diff_km)
+
+area_diff_df_birds <- area_diff_df %>%
+  filter(taxa == "birds") 
+
+median(area_diff_df_birds$diff_km)
+mean(area_diff_df_birds$diff_km)
+range(area_diff_df_birds$diff_km)
+
+
+median(niche_diff_df$percent_change)
+mean(niche_diff_df$percent_change)
+range(niche_diff_df$percent_change)
+
+niche_diff_df_mammals <- niche_diff_df %>%
+  filter(taxa == "mammals")
+
+median(niche_diff_df_mammals$percent_change)
+mean(niche_diff_df_mammals$percent_change)
+range(niche_diff_df_mammals$percent_change)
+
+niche_diff_df_birds <- niche_diff_df %>%
+  filter(taxa == "birds") 
+
+median(niche_diff_df_birds$percent_change)
+mean(niche_diff_df_birds$percent_change)
+range(niche_diff_df_birds$percent_change)
+
