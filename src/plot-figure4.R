@@ -88,10 +88,10 @@ niche_diff_df <- do.call("rbind", diff_out) %>%
 
 
 area_diff <- area_diff_df %>%
-  select(species, common_name, taxa, diff_km) %>%
-  mutate(bin = cut(diff_km, 
-                   breaks = c(-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000),
-                   labels = c(-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5))) %>%
+  select(species, common_name, taxa, percent_change) %>%
+  mutate(bin = cut(percent_change, 
+                   breaks = c(-100000,-10000,-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000,10000,1000000),
+                   labels = c(-6.5,-5.5,-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5))) %>%
   filter(!is.na(bin)) %>%
   group_by(bin) %>%
   arrange(taxa) %>%
@@ -103,17 +103,14 @@ area_diff <- area_diff_df %>%
 niche_diff <- niche_diff_df %>%
   select(species, common_name, taxa, percent_change) %>%
   mutate(bin = cut(percent_change, 
-                   breaks = c(-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000),
-                   labels = c(-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5))) %>%
+                   breaks = c(-100000,-10000,-1000,-100,-10,-1,-0.1,0,0.1,1,10,100,1000,10000,1000000),
+                   labels = c(-6.5,-5.5,-4.5,-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5))) %>%
   filter(!is.na(bin)) %>%
   group_by(bin) %>%
   arrange(taxa) %>%
   mutate(y = seq(1:n()))  %>%
   ungroup() %>%
   mutate(x = as.numeric(as.character(bin))) 
-
-area_diff$taxa[area_diff$species== "Puma concolor"] <- "mammals"
-niche_diff$taxa[niche_diff$species== "Puma concolor"] <- "mammals"
 
 
 max_val <- max(c(abs(min(area_diff$x)), max(area_diff$x),abs(min(niche_diff$x)), max(niche_diff$x)))
@@ -136,11 +133,12 @@ p1 <- ggplot(data = area_diff) +
     axis.text = element_text(size = 7),
     axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.5, 0.5))) +  
-  scale_x_continuous(breaks = seq(-4,4, by = 1),
-                     labels = c(-100,-10,-1,-0.1,0,0.1,1,10,100)) +
+  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.2))) +  
+  scale_x_continuous(breaks = seq(-6,6, by = 1),
+                     labels = c("-10K", "-1K", "-100", "-10", "-1", "-0.1", "0",
+                                "0.1","1", "10", "100", "1K", "10K")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in area size'~(km^2)))
+  labs(x = 'Change in area size (%)')
 
 
 p2 <- ggplot(data = niche_diff) +
@@ -160,28 +158,28 @@ p2 <- ggplot(data = niche_diff) +
     axis.text = element_text(size = 7),
     axis.title.x = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
-  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.5))) +  
-  scale_x_continuous(breaks = seq(-4,4, by = 1),
-                     labels = c(-100,-10,-1,-0.1,0,0.1,1,10,100)) +
+  scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.2))) +  
+  scale_x_continuous(breaks = seq(-6,6, by = 1),
+                     labels = c("-10K", "-1K", "-100", "-10", "-1", "-0.1", "0",
+                                "0.1","1", "10", "100", "1K", "10K")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = bquote('Change in niche size (%)'))
+  labs(x = 'Change in niche size (%)')
 
 p <- p1/p2 +
-  plot_layout(heights = c(1, 1.7))
-ggsave(p, file = "~/Desktop/figure4.pdf", height = 50, width = 90, units = "mm")
+  plot_layout(heights = c(1.2,1))
+ggsave(p, file = "~/Desktop/figure4.pdf", height = 55, width = 90, units = "mm")
 
 area_diff_df_mammals <- area_diff_df %>%
   filter(taxa == "mammals")
   
-median(area_diff_df_mammals$diff_km)
-mean(area_diff_df_mammals$diff_km)
+
+median(area_diff_df_mammals$percent_change)
 range(area_diff_df_mammals$diff_km)
 
 area_diff_df_birds <- area_diff_df %>%
   filter(taxa == "birds") 
 
-median(area_diff_df_birds$diff_km)
-mean(area_diff_df_birds$diff_km)
+median(area_diff_df_birds$percent_change)
 range(area_diff_df_birds$diff_km)
 
 
