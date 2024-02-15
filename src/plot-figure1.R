@@ -4,6 +4,8 @@ library(sf)
 library(data.table)
 library(proj4)
 library(spData)
+library(ggspatial)
+
 rm(list = ls())
 
 # species list + taxonomy
@@ -110,9 +112,10 @@ us_map <- ggplot(us) +
 
 p <- us_map +
   geom_sf(data = hex, aes(fill = events), color = "transparent") +
+  annotation_scale(location = "bl", width_hint = 0.2) +
   coord_sf(
-    xlim = c(bbox[1] - abs(bbox[1]*bbox_expand), bbox[3] + abs(bbox[3]*bbox_expand)), 
-    ylim = c(bbox[2] - abs(bbox[2]*bbox_expand), bbox[4] + abs(bbox[4]*bbox_expand)), 
+    #xlim = c(bbox[1] - abs(bbox[1]*bbox_expand), bbox[3] + abs(bbox[3]*bbox_expand)), 
+    #ylim = c(bbox[2] - abs(bbox[2]*bbox_expand), bbox[4] + abs(bbox[4]*bbox_expand)), 
            datum = NA, crs = st_crs("EPSG:5070")) +
   scale_fill_viridis_c(option = "magma",trans = "log10") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
