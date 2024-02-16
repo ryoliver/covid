@@ -11,11 +11,6 @@ library(ggh4x)
 
 rm(list = ls())
 
-area_icon <- "~/Desktop/covid-results/images/area-size.png"
-niche_icon <- "~/Desktop/covid-results/images/niche-size.png"
-
-mammal_icon <-  "~/Desktop/covid-results/images/carnivore.png"
-bird_icon <- "~/Desktop/covid-results/images/corvid.png"
 
 # species results
 area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-11-20.csv") %>%
