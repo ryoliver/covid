@@ -10,7 +10,7 @@ library(patchwork)
 rm(list = ls())
 
 #- Color palette
-pal <- c("#8895BF","#F98177")
+pal <- c("#9a7aa0ff","#fcaf58ff")
 
 #-- Load Data --#
 

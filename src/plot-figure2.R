@@ -94,7 +94,7 @@ p <- ggplot(results) +
                  group = sig_code), 
              size = 2) +
   scale_color_manual(name ="model structure",
-                     values = c("#F98177","#8895BF","#aeb6bf","#6BB0B3")) +
+                     values = c("#fcaf58ff","#9a7aa0ff","#aeb6bf","#79B473")) +
   scale_y_discrete(labels=c( "Moose"=expression(bold(Moose)),
                              "Pronghorn"=expression(bold(Pronghorn)),
                              "Great egret"=expression(bold("Great egret")),
@@ -157,6 +157,7 @@ summarize_species_both_responses <- species_both_responses %>%
 
 # count number of species that respond in either area OR niche size
 species_single_response <- results_clean %>%
+  filter(common_name != "Snow goose") %>%
   group_by(driver, species) %>%
   summarise(n_responses = n()) %>%
   filter(n_responses == 1) 

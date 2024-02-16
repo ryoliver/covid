@@ -118,8 +118,8 @@ max_val <- max(c(abs(min(area_diff$x)), max(area_diff$x),abs(min(niche_diff$x)),
 
 p1 <- ggplot(data = area_diff) +
   geom_point(aes(x = x, y = y, color = taxa), size = 2) +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  scale_fill_manual(values = c("#1481BA","#cbd081")) +
+  scale_color_manual(values = c("#1481BA","#cbd081")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme_minimal() +
   theme(
@@ -143,8 +143,8 @@ p1 <- ggplot(data = area_diff) +
 
 p2 <- ggplot(data = niche_diff) +
   geom_point(aes(x = x, y = y, color = taxa), size = 2) +
-  scale_fill_manual(values = c("#FF9B54","#A7D3A6")) +
-  scale_color_manual(values = c("#FF9B54","#A7D3A6")) +
+  scale_fill_manual(values = c("#1481BA","#cbd081")) +
+  scale_color_manual(values = c("#1481BA","#cbd081")) +
   geom_vline(aes(xintercept = 0), linetype = "solid", size = 0.5, alpha = 0.8, color = "black") +
   theme_minimal() +
   theme(
