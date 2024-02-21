@@ -277,3 +277,51 @@ summarize_species_responses
 
 summarize_species_drivers
 
+
+summarize_species_drivers$driver <- factor(summarize_species_drivers$driver,
+                                           levels = c("human mobility","landscape modification"))
+
+summarize_species_drivers$response <- factor(summarize_species_drivers$response,
+                                             levels = c("area size", "both","niche size"))
+
+
+summarize_species_responses$driver <- factor(summarize_species_responses$driver,
+                                             levels = c("human mobility","both","landscape modification"))
+
+summarize_species_responses$response <- factor(summarize_species_responses$response,
+                                               levels = c("area size","niche size"))
+
+p2c_presentation <- ggplot(summarize_species_drivers, aes(fill=response, x=response, y=percent_species)) + 
+  facet_grid(~driver) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
+  theme_minimal() +
+  theme(
+    
+    legend.position = "none",
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text = element_text(size = 8),
+    axis.title.y = element_text(size = 10)) +
+  labs(y = "Species (%)")
+
+
+p2b_presentation <-ggplot(summarize_species_responses, aes(fill=driver, x=driver, y=percent_species)) + 
+  facet_grid(~response) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
+  theme_minimal() +
+  theme(
+    
+    legend.position = "none",
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text = element_text(size = 8),
+    axis.title.y = element_text(size = 10)) +
+  labs(y = "Species (%)")
+
+ggsave(p2c_presentation, file = "~/Desktop/fig2c-presentation.pdf", width = 5, height = 3, units = "in")
+
+ggsave(p2b_presentation, file = "~/Desktop/fig2b-presentation.pdf", width = 5, height = 3, units = "in")
+
+
