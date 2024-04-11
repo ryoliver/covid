@@ -40,7 +40,12 @@ area_diff_df <- do.call("rbind", diff_out) %>%
   mutate(diff_km = -diff/1000000,
          prop = est_high/est_low,
          perc_num = -round((1-prop)*100, 0),
-         percent_change = ((est_high-est_low)/est_low)*100) %>% 
+         percent_change = ((est_high-est_low)/est_low)*100) 
+
+area_diff_non_sig <- area_diff_df %>%
+  filter(tot_sig == "non-sig")
+
+area_diff_df <- area_diff_df %>% 
   filter(tot_sig == "sig") %>% 
   mutate(direct = case_when(diff_km > 0 ~ "p",
                             diff_km < 0 ~ "n"),
@@ -78,7 +83,14 @@ for(i in 1:length(spl)){
 }
 
 niche_diff_df <- do.call("rbind", diff_out) %>% 
-  mutate(percent_change = ((est_high-est_low)/est_low)*100) %>% 
+  mutate(percent_change = ((est_high-est_low)/est_low)*100) 
+
+
+niche_diff_non_sig <- niche_diff_df %>%
+  filter(tot_sig == "non-sig")
+
+
+niche_diff_df <- niche_diff_df %>% 
   filter(tot_sig == "sig") %>% 
   mutate(direct = case_when(diff > 0 ~ "p",
                             diff < 0 ~ "n"),
@@ -128,17 +140,16 @@ p1 <- ggplot(data = area_diff) +
     axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
     legend.position = "none",
     legend.title = element_blank(),
-    #axis.text.y = element_blank(),
-    axis.title = element_blank(),
     axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 7),
+    axis.title = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
   scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.2))) +  
   scale_x_continuous(breaks = seq(-6,6, by = 1),
                      labels = c("-10K", "-1K", "-100", "-10", "-1", "-0.1", "0",
                                 "0.1","1", "10", "100", "1K", "10K")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = 'Change in area size (%)')
+  labs(x = 'Change in area size (%)',
+       y = 'Species (n)')
 
 
 p2 <- ggplot(data = niche_diff) +
@@ -153,21 +164,24 @@ p2 <- ggplot(data = niche_diff) +
     axis.line.x = element_line(colour = "#4a4e4d", linewidth =0.3, linetype='solid'),
     legend.position = "none",
     legend.title = element_blank(),
-    #axis.text.y = element_blank(),
-    axis.title = element_blank(),
     axis.text = element_text(size = 7),
-    axis.title.x = element_text(size = 7),
+    axis.title = element_text(size = 7),
     axis.ticks.x = element_line(color = "#4a4e4d")) +
   scale_y_continuous(breaks = seq(0,10, by = 2), expand = expansion(mult = c(0.2, 0.2))) +  
   scale_x_continuous(breaks = seq(-6,6, by = 1),
                      labels = c("-10K", "-1K", "-100", "-10", "-1", "-0.1", "0",
                                 "0.1","1", "10", "100", "1K", "10K")) +
   coord_cartesian(xlim = c(-max_val,max_val)) +
-  labs(x = 'Change in niche size (%)')
+  labs(x = 'Change in niche size (%)',
+       y = 'Species (n)')
 
 p <- p1/p2 +
   plot_layout(heights = c(1.2,1))
 ggsave(p, file = "~/Desktop/figure4.pdf", height = 55, width = 90, units = "mm")
+
+print(paste0("non-significant area size: ",n_distinct(area_diff_non_sig$species), " species"))
+
+print(paste0("non-significant niche size: ",n_distinct(niche_diff_non_sig$species), " species"))
 
 area_diff_df_mammals <- area_diff_df %>%
   filter(taxa == "mammals")
