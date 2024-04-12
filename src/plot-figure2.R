@@ -11,7 +11,6 @@ library(ggh4x)
 
 rm(list = ls())
 
-
 # species results
 area_ghm <- fread("~/Desktop/covid-results/area_ghm_effects_2023-11-20.csv") %>%
   mutate(response = rep("area_ghm", nrow(.))) %>%
@@ -138,6 +137,24 @@ results_clean <- results %>%
                               response == "niche_ghm" ~ "niche size")) %>%
   filter(!sig_code %in% c("low_int", "ns_add"))
 
+# species that don't show responses in area OR niche size
+species_no_responses <- results %>%
+  mutate(driver = ifelse(response %in% c("area_sg", "niche_sg"), "mobility", "modification"),
+         response = case_when(response == "area_sg" ~ "area size",
+                              response == "area_ghm" ~ "area size",
+                              response == "niche_sg" ~ "niche size",
+                              response == "niche_ghm" ~ "niche size")) %>%
+  filter(sig_code == "ns_add") %>%
+  group_by(driver, species) %>%
+  summarise(n_responses = n()) %>%
+  filter(n_responses > 1)
+
+# count number of species that sdon't show responses in area OR niche size per driver
+summarize_species_no_responses <- species_no_responses %>%
+  group_by(driver) %>%
+  summarise(n_species = n()) %>%
+  mutate(response = rep("none", n()))
+
 # species that show responses in both area AND niche size
 species_both_responses <- results_clean %>%
   group_by(driver, species) %>%
@@ -164,7 +181,9 @@ summarize_species_single_response <- results_clean %>%
   summarise(n_species = n())
 
 # combine summaries
-summarize_species_drivers <- rbind(summarize_species_both_responses, summarize_species_single_response) %>%
+summarize_species_drivers <- rbind(summarize_species_both_responses, 
+                                   summarize_species_single_response,
+                                   summarize_species_no_responses) %>%
   arrange(driver) %>%
   mutate(driver = case_when(driver == "mobility" ~ "human mobility",
                             driver == "modification" ~ "landscape modification"))
@@ -173,7 +192,7 @@ summarize_species_drivers$driver <- factor(summarize_species_drivers$driver,
                                            levels = c("landscape modification","human mobility"))
 
 summarize_species_drivers$response <- factor(summarize_species_drivers$response,
-       levels = c("niche size", "both","area size"))
+                                             levels = c( "none","niche size", "both","area size"))
 
 total_species_drivers <- summarize_species_drivers %>%
   group_by(driver) %>%
@@ -185,7 +204,7 @@ summarize_species_drivers <- summarize_species_drivers %>%
 
 p_drivers <- ggplot(summarize_species_drivers, aes(fill=response, y=driver, x=percent_species)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
+  scale_fill_manual(values = c("#726D74","#878188", "#B9B5BA","#DCDCDD")) +
   
   scale_y_discrete(labels = c("human mobility" = "human\nmobility",
                               "landscape modification" = "landscape\nmodification")) +
@@ -276,52 +295,5 @@ ggsave(p_all, file = "~/Desktop/fig2b.pdf", width = 170, height = 30, units = "m
 summarize_species_responses
 
 summarize_species_drivers
-
-
-summarize_species_drivers$driver <- factor(summarize_species_drivers$driver,
-                                           levels = c("human mobility","landscape modification"))
-
-summarize_species_drivers$response <- factor(summarize_species_drivers$response,
-                                             levels = c("area size", "both","niche size"))
-
-
-summarize_species_responses$driver <- factor(summarize_species_responses$driver,
-                                             levels = c("human mobility","both","landscape modification"))
-
-summarize_species_responses$response <- factor(summarize_species_responses$response,
-                                               levels = c("area size","niche size"))
-
-p2c_presentation <- ggplot(summarize_species_drivers, aes(fill=response, x=response, y=percent_species)) + 
-  facet_grid(~driver) +
-  geom_bar(stat="identity") +
-  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
-  theme_minimal() +
-  theme(
-    
-    legend.position = "none",
-    legend.title = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text = element_text(size = 8),
-    axis.title.y = element_text(size = 10)) +
-  labs(y = "Species (%)")
-
-
-p2b_presentation <-ggplot(summarize_species_responses, aes(fill=driver, x=driver, y=percent_species)) + 
-  facet_grid(~response) +
-  geom_bar(stat="identity") +
-  scale_fill_manual(values = c("#878188", "#B9B5BA","#DCDCDD")) +
-  theme_minimal() +
-  theme(
-    
-    legend.position = "none",
-    legend.title = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text = element_text(size = 8),
-    axis.title.y = element_text(size = 10)) +
-  labs(y = "Species (%)")
-
-ggsave(p2c_presentation, file = "~/Desktop/fig2c-presentation.pdf", width = 5, height = 3, units = "in")
-
-ggsave(p2b_presentation, file = "~/Desktop/fig2b-presentation.pdf", width = 5, height = 3, units = "in")
 
 
